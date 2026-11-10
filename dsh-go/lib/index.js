@@ -157,7 +157,20 @@ function localeIsEn(caps) {
   return String(caps?.locale || '').toLowerCase().startsWith('en')
 }
 
+/** App 升级会重写 /usr/local/bin/dsh，钩子随之消失；插件加载时补装一次，下次启动生效。 */
+async function selfHealBootHook() {
+  try {
+    if (bootHookInstalled()) return
+    const api = await loadBootHook()
+    const r = api.installBootHook(dshHome())
+    const logFile = path.join(dshHome(), 'dsh-purge', 'boot-hook.log')
+    fs.mkdirSync(path.dirname(logFile), { recursive: true })
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] auto-install ok=${r.ok ? 1 : 0} ${r.error || ''}\n`)
+  } catch { /* 自愈失败不影响插件其余功能 */ }
+}
+
 export function apply(ctx) {
+  void selfHealBootHook()
   ctx.inject(['dshGo'], (ctx) => {
     // 状态条：清洗进度，点开面板。
     ctx.dshGo.strip('status', (scope, emit, caps) => {
