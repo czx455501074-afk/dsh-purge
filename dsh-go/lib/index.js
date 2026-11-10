@@ -113,6 +113,27 @@ function summarize(state) {
   }
 }
 
+let bootHookPromise = null
+
+/** dsh-purge 包里的启动钩子安装器(手机会话里不方便敲 CLI 时,面板直接装)。 */
+async function loadBootHook() {
+  if (bootHookPromise) return bootHookPromise
+  bootHookPromise = (async () => {
+    for (const root of purgeRoots()) {
+      const entry = path.join(root, 'lib', 'boot-hook.js')
+      if (!fs.existsSync(entry)) continue
+      return import(pathToFileURL(entry).href)
+    }
+    throw new Error('没找到 lib/boot-hook.js,先升级 dsh-purge')
+  })()
+  try {
+    return await bootHookPromise
+  } catch (err) {
+    bootHookPromise = null
+    throw err
+  }
+}
+
 async function runApply() {
   const core = await loadCore()
   const state = await core.gatherState()
@@ -182,6 +203,7 @@ export function apply(ctx) {
             items: [
               { label: '应用清洗', action: 'apply', icon: 'check', style: 'primary' },
               { label: '还原', action: 'revert', icon: 'refresh' },
+              { label: '启动钩子', action: 'bootHook', icon: 'link' },
               { label: '刷新', action: 'refresh', icon: 'retry' },
             ],
           },
@@ -241,6 +263,23 @@ export function apply(ctx) {
           void readState(true)
           return { type: 'refresh', id: PANEL_ID }
         },
+        bootHook: () => ({
+          pending: { label: '正在安装', timeoutMs: 30_000 },
+          result: async () => {
+            try {
+              const api = await loadBootHook()
+              const r = api.installBootHook(dshHome())
+              if (!r.ok) return { type: 'toast', text: '装不上：' + String(r.error || '').slice(0, 30) }
+              const state = await readState(true)
+              return [
+                { type: 'toast', text: r.changed ? '启动钩子已装，下次启动自动重打' : '启动钩子本来就在' },
+                { type: 'patch', id: PANEL_ID, data: summarize(state) },
+              ]
+            } catch (err) {
+              return { type: 'toast', text: '装不上：' + String(err?.message || err).slice(0, 24) }
+            }
+          },
+        }),
       },
     })
 
