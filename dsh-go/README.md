@@ -27,8 +27,25 @@ dsh plugin --profile web add "$P"
 补丁写进的是磁盘上的 `@deepseek-ai`，当前引擎进程要先重启才会加载新代码：
 到 App 的 **设置 → 引擎 → 重启引擎**（或直接重开 App）。
 
-面板不会自己杀进程重启，也不会注入 App 管理的 `/usr/local/bin/dsh`。
-需要让终端里的 `dsh` 也带上 `DSH_HOME` 时，再设 `DSH_PURGE_PATCH_SHIM=1`。
+面板不会自己杀进程重启。
+
+## 补丁在手机上的坑：每次启动会被还原
+
+App 启动引擎时会先用自带运行时还原 `/opt/dsh`，所以 `--apply` 写进去的补丁到下次启动就没了（面板状态会回到全 pending）。装一个启动钩子解决：
+
+```sh
+dsh-purge --boot-hook-install
+```
+
+它在启动器 `/usr/local/bin/dsh` 的 `node` 后面加了一个 `--import=$DSH_HOME/dsh-purge-boot.mjs`，位置在官方的 boot-cache 之前。每次引擎启动时，钩子先重打补丁、再让 DSH 加载模块，所以**同一轮启动就是补丁后的宿主**（约 2 秒开销）。
+
+- 日志：`$DSH_HOME/dsh-purge/boot-hook.log`（每次启动一行 applied / failed / ms）；
+- App 升级运行时会重写启动器，升级后重新执行一次 `--boot-hook-install`；
+- 移除：`dsh-purge --boot-hook-remove`（从 `.dshpurge.bak` 逐字节还原启动器）；
+- 临时跳过：`DSH_PURGE_BOOT_HOOK=0 dsh web ...`；
+- 状态：`dsh-purge --boot-hook-status`。
+
+面板不会注入 App 管理的启动器其他内容；需要终端里的 `dsh` 也带 `DSH_HOME` 时，仍可设 `DSH_PURGE_PATCH_SHIM=1`。
 
 ## 卸载
 

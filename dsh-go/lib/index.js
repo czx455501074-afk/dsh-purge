@@ -70,6 +70,17 @@ async function readState(force = false) {
   return state
 }
 
+/** dsh-go 启动钩子是否已装：App 每次启动会还原 /opt/dsh,没钩子补丁活不过一次重启。 */
+function bootHookInstalled() {
+  try {
+    const shim = ['/usr/local/bin/dsh', '/usr/bin/dsh', '/bin/dsh'].find((fp) => fs.existsSync(fp))
+    if (!shim) return false
+    return fs.readFileSync(shim, 'utf8').includes('dsh-purge-boot.mjs')
+  } catch {
+    return false
+  }
+}
+
 /** 面板数据：一次推完整对象，App 自己算差量。 */
 function summarize(state) {
   const status = state?.patch_status || {}
@@ -92,6 +103,10 @@ function summarize(state) {
     pendingCount: todo.length,
     host: state?.ai_base || '未定位',
     home: state?.dsh_home || dshHome(),
+    bootHook: bootHookInstalled(),
+    bootHookText: bootHookInstalled()
+      ? '启动钩子：已装，每次启动自动重打'
+      : '启动钩子：未装，重启引擎后补丁会丢（dsh-purge --boot-hook-install）',
     note: state?.ai_base
       ? '应用后到 App「引擎」页重启引擎才生效'
       : '没找到 @deepseek-ai。先装 dsh-purge，再回来点应用',
@@ -160,6 +175,7 @@ export function apply(ctx) {
           { type: 'metric', label: '已清洗', value: { $: 'data.applied' } },
           { type: 'progress', value: { $: 'data.percent' }, label: '进度' },
           { type: 'callout', text: { $: 'data.note' }, tone: 'info' },
+          { type: 'text', text: { $: 'data.bootHookText' }, tone: 'muted' },
           { type: 'list', items: { $: 'data.pending' } },
           {
             type: 'actions',

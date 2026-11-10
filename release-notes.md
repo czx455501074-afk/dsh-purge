@@ -1,3 +1,17 @@
+# 1.2.2
+
+## 中文
+
+- 新增 **dsh-go 启动钩子**：App 每次启动引擎都会还原 `/opt/dsh`，`--apply` 的补丁活不过一次重启。`dsh-purge --boot-hook-install` 在 `/usr/local/bin/dsh` 的 node 后面加 `--import=$DSH_HOME/dsh-purge-boot.mjs`（排在官方 boot-cache 之前），每次启动先用 2 秒重打补丁，同一轮启动即加载补丁后的宿主；日志写 `$DSH_HOME/dsh-purge/boot-hook.log`。
+- 钩子失败只记日志、绝不拦启动；并发启动用 lock 去重；`--boot-hook-remove` 从 `.dshpurge.bak` 逐字节还原启动器，`--boot-hook-status` 查看状态，`DSH_PURGE_BOOT_HOOK=0` 临时跳过。
+- `dsh-go/README.md` 补了「补丁为什么每次重启消失」和钩子用法。
+
+## English
+
+- New **dsh-go boot hook**: the app restores `/opt/dsh` on every engine start, so `--apply` edits die on the next launch. `dsh-purge --boot-hook-install` adds `--import=$DSH_HOME/dsh-purge-boot.mjs` before the official boot cache in `/usr/local/bin/dsh`; each start re-applies the patches in ~2s, so the same boot loads the patched host. Log: `$DSH_HOME/dsh-purge/boot-hook.log`.
+- The hook only logs failures and never blocks startup; a lock dedupes concurrent starts; `--boot-hook-remove` restores the launcher byte-for-byte from `.dshpurge.bak`; `--boot-hook-status` inspects it; `DSH_PURGE_BOOT_HOOK=0` skips one run.
+- `dsh-go/README.md` now explains why patches vanish on restart and how to use the hook.
+
 # 1.2.1
 
 ## 中文

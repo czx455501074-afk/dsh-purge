@@ -36,7 +36,8 @@ function printStatus(state) {
 }
 
 async function main() {
-  const mode = args.find((a) => ["--apply", "--revert", "--uninstall", "--status", "--edit", "--help"].includes(a));
+  const mode = args.find((a) => ["--apply", "--revert", "--uninstall", "--status", "--edit", "--help",
+    "--boot-hook-install", "--boot-hook-remove", "--boot-hook-status"].includes(a));
 
   if (mode === "--help" || args.includes("-h")) {
     console.log(`dsh-purge 用法:
@@ -45,6 +46,9 @@ async function main() {
   dsh-purge --revert     回滚还原
   dsh-purge --uninstall  卸载插件（已应用则先还原）
   dsh-purge --edit       编辑注入文件 prompt-inject.md
+  dsh-purge --boot-hook-install   dsh-go: 让补丁在 App 每次启动时自动重打（改写启动器 --import）
+  dsh-purge --boot-hook-remove    移除启动钩子并还原启动器
+  dsh-purge --boot-hook-status    查看启动钩子状态
   dsh-purge --help       帮助`);
     return;
   }
@@ -52,6 +56,33 @@ async function main() {
   const state = await core.gatherState();
   console.log(printStatus(state));
   console.log("");
+
+  if (mode === "--boot-hook-install" || mode === "--boot-hook-remove" || mode === "--boot-hook-status") {
+    const bootHook = await import("../lib/boot-hook.js");
+    if (mode === "--boot-hook-install") {
+      const r = bootHook.installBootHook(state.dsh_home);
+      if (!r.ok) {
+        console.log("[ERROR] " + r.error);
+        process.exit(1);
+      }
+      console.log(r.changed
+        ? `  ✓ 已写入启动钩子 / boot hook installed: ${r.shim} → ${r.hook}`
+        : `  - 启动钩子已存在 / already installed: ${r.hook}`);
+      console.log("  - 启动器备份 / launcher backup: " + r.backup);
+      console.log("  - 下次引擎启动时先重打补丁再加载宿主；App 升级运行时后需要重新执行本命令。");
+    } else if (mode === "--boot-hook-remove") {
+      const r = bootHook.removeBootHook(state.dsh_home);
+      console.log(`  ${r.restored ? "✓ 启动器已还原" : "- 启动器未改动"} / launcher ${r.restored ? "restored" : "untouched"}`);
+      console.log(`  ${r.removed ? "✓ 已删除钩子文件" : "- 钩子文件不存在"} / hook file ${r.removed ? "removed" : "absent"}`);
+    } else {
+      const s = bootHook.bootHookStatus(state.dsh_home);
+      console.log("  shim           " + (s.shim || "未找到 / not found"));
+      console.log("  钩子文件       " + s.hook + (s.hook_present ? " (存在)" : " (缺失)"));
+      console.log("  启动器已注入   " + (s.shim_injected ? "是 / yes" : "否 / no"));
+      console.log("  备份           " + (s.backup ? "有 / yes" : "无 / no"));
+    }
+    return;
+  }
 
   if (mode === "--apply") {
     if (!state.ai_base) {
