@@ -1,0 +1,4 @@
+# dsh-go 原生插件：id 与 package.json 的 name 必须一致。
+- insert:
+    - id: local-dsh-purge
+      name: local-dsh-purge

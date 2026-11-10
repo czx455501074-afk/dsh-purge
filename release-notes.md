@@ -1,3 +1,23 @@
+# 1.2.0
+
+## 中文
+
+- 版本 **1.2.0**，适配 **DSH 0.2.2-rc.1**（官方桌面 / 官方 `dsh web` / **dsh-go 手机 App** 同一套补丁）。
+- 0.2.2 适配：提示词从 `dsh-web-app` 拆到 `dsh-harness-dev-context`、`dsh-deliverable-file-references`；审批流水线从 `dsh-tools/lib/index.js` 拆到 `lib/pipeline.js`；run_code 移到 `dsh-tool-executor-ptc`。对应 #14 / #32 / #53 / #54 / #60 / #62 / #67 / #74 / #77 增加了 0.2.2 锚点。
+- 新增 **dsh-go 手机原生面板**（`dsh-go/`）：输入框上方状态条显示「清洗 x/y」，加号面板里可应用 / 还原，详情页有进度与待清洗清单。手机上没有网页侧栏也能操作。
+- dsh-go 上不再自己杀进程重启：应用后提示到 App「引擎」页重启引擎；`/usr/local/bin/dsh` 是 App 管理的启动器，默认不再注入（需要时设 `DSH_PURGE_PATCH_SHIM=1`）。
+- 修复重复应用把 `.dshpurge.bak` 刷成已清洗内容的 bug：不带字面 marker 的补丁（如网页身份句）也会被认作「我们打过的产物」，还原后能逐字节回到原版；还原时顺手清掉多余 bak。
+- 新增 `scripts/diagnose-patches.mjs`（`npm run diagnose`）：逐补丁列出已应用 / 可应用 / 锚点漂移，并给出最接近的新原文行，换 DSH 版本时先跑它。
+
+## English
+
+- **1.2.0**, targets **DSH 0.2.2-rc.1** (official desktop, official `dsh web`, and the **dsh-go phone app** share the same patch set).
+- 0.2.2 anchors: prompts moved to `dsh-harness-dev-context` / `dsh-deliverable-file-references`; the approval pipeline moved to `dsh-tools/lib/pipeline.js`; run_code moved to `dsh-tool-executor-ptc`. Added 0.2.2 variants for #14 / #32 / #53 / #54 / #60 / #62 / #67 / #74 / #77.
+- New **dsh-go native panel** (`dsh-go/`): a composer strip shows progress, a panel applies / reverts, and the phone UI needs no web sidebar.
+- On dsh-go the plugin no longer kills and respawns the engine: it asks you to restart the engine in the app. The app-managed `/usr/local/bin/dsh` launcher is left alone unless `DSH_PURGE_PATCH_SHIM=1`.
+- Fixed re-apply corrupting `.dshpurge.bak` for patches that leave no literal marker; revert now restores byte-identical files and drops leftover backups.
+- Added `scripts/diagnose-patches.mjs` (`npm run diagnose`) to report applied / pending / drifted anchors with the nearest upstream line.
+
 # 1.1.71
 
 ## 中文

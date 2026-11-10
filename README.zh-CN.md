@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.1.71</strong></p>
+<p align="center"><strong>Version 1.2.0</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分</em>
@@ -15,7 +15,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
   <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.0--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.1-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
@@ -31,7 +31,7 @@
 
 > **暂停更新。** 作者因工作安排，近期没有稳定收入，项目维护暂时搁置：不再发版、暂不收 issue / PR，也不保证跟进新版 dsh。仓库仍可自用；赞助见下方。恢复维护时会在本 README 说明。
 
-> **官方 Web 和官方桌面端都支持。** 官方 `dsh web` 用 profile `web`；官方桌面 EXE（DeepSeek Harness **0.2.0-rc.2**）用 profile `desktop`。两边分开安装、分开点「应用」。当前版本只适配 dsh 0.2；更早的 dsh 用对应的老版本插件。社区桌面端不维护。
+> **官方 Web、官方桌面端和 dsh-go 手机版都支持。** 官方 `dsh web` 用 profile `web`；官方桌面 EXE（DeepSeek Harness **0.2.2-rc.1**）用 profile `desktop`；**dsh-go 手机 App** 也用 profile `web`，另外装一份 [原生面板](dsh-go/README.md) 才能在手机上点应用。Web / 桌面分开安装、分开点「应用」。当前版本适配 dsh 0.2.2；更早的 dsh 用对应的老版本插件。社区桌面端不维护。
 >
 > 写进 profile 还不会改宿主。点会话标题旁的 **dsh-purge** → **清洗** → **应用**。成功会自动重启；补丁没打完不重启。重启后新开一轮对话，注入才进当前会话。
 >
@@ -162,10 +162,11 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 最新版只支持 **dsh 0.2**，不要拿它去打 0.1.x。
 
-- **dsh 0.2**（官方桌面 **0.2.0-rc.2** / 官方 `dsh web`）：用 **1.1.40** 及以上。本页命令装的就是这一档。
+- **dsh 0.2.2-rc.1**（官方桌面 / 官方 `dsh web` / **dsh-go 手机 App**）：用 **1.2.0** 及以上。本页命令装的就是这一档。
+- **dsh 0.2.0-rc.2**：用 **1.1.40 – 1.1.71**。
 - **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/YuJunZhiXue/dsh-purge/releases) 里选对应标签。
 
-对不上的补丁会显示待应用或跳过，不会乱改文件。
+对不上的补丁会显示待应用或跳过，不会乱改文件。换 dsh 版本后先跑 `npm run diagnose`（`node scripts/diagnose-patches.mjs`）看哪些锚点漂移了。
 
 ---
 
@@ -192,16 +193,16 @@ dsh plugin --profile desktop add dsh-purge
 桌面客户端也可以点按钮（`dsh://` 唤起）：
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.1.71&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.0&repo=YuJunZhiXue%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2FYuJunZhiXue%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 ### 装完都要做这三步
 
 只把插件写进 profile **还不会**改 `@deepseek-ai`。
 
-1. **退出并重新打开**刚装的那个宿主：Web 关掉 `dsh web` 再开；桌面端退出托盘再打开对应 exe。
-2. 在**这个宿主**点会话标题旁的 **dsh-purge**，在 **清洗** 页点 **「应用」**。宿主的设置页里没有这个条目。
-3. 「应用」成功后会自动重启一次，让补丁进入当前进程。没做完不会重启。
+1. **退出并重新打开**刚装的那个宿主：Web 关掉 `dsh web` 再开；桌面端退出托盘再打开对应 exe；dsh-go 直接重开 App。
+2. 在**这个宿主**点会话标题旁的 **dsh-purge**，在 **清洗** 页点 **「应用」**。宿主的设置页里没有这个条目。dsh-go 上用 [原生面板](dsh-go/README.md)：输入框上方的「清洗」状态条 / 加号面板。
+3. 「应用」成功后会自动重启一次，让补丁进入当前进程。没做完不会重启。dsh-go 上插件不碰 App 的引擎进程，**要在 App「设置 → 引擎」里重启引擎**（或重开 App）。
 
 Web 的控件只动 Web，桌面端的只动桌面应用。不要在一个宿主里点另一个宿主的应用。
 
@@ -210,6 +211,23 @@ Web 的控件只动 Web，桌面端的只动桌面应用。不要在一个宿主
 - 会话标题旁有 **dsh-purge**，点开后在「清洗」里能点「应用」。
 - 聊天里 `/purge status` 能打出 `DSH_HOME` 和补丁列表，路径应是你正在用的那一份。
 - 没装的可选包（例如梁神）显示跳过，不挡住应用完成。
+
+### dsh-go 手机版（原生面板）
+
+dsh-go 的对话界面是 Flutter 原生界面，不加载网页版侧栏，所以会话标题旁那个按钮在手机上不会出现。装上 `dsh-go/` 里的原生面板后：
+
+- 输入框上方有 **清洗 x/y** 状态条，点开是「破甲清洗」面板；
+- 加号面板里多了 **应用清洗** / **还原**；
+- 面板里能看到进度、待清洗补丁清单、宿主路径。
+
+```sh
+dsh plugin --profile web add dsh-purge
+P="${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/dsh-go-purge"
+mkdir -p "$(dirname "$P")" && cp -r dsh-go "$P"
+dsh plugin --profile web add "$P"
+```
+
+已在手机上装了本仓库的，把第二行的 `dsh-go` 换成仓库里的 `dsh-go` 目录即可。应用后到 App「设置 → 引擎 → 重启引擎」。详细说明见 [dsh-go/README.md](dsh-go/README.md)。
 
 ### 交给助手安装
 

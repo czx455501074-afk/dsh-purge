@@ -1,0 +1,62 @@
+{
+  "name": "local-dsh-purge",
+  "version": "1.2.0",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "description": "dsh-purge 的 dsh-go 手机原生面板：在 App 里看清洗进度、应用、还原",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+  },
+  "dshGo": {
+    "v": 1,
+    "title": {
+      "zh": "破甲清洗",
+      "en": "Purge"
+    },
+    "icon": "wrench",
+    "contributes": {
+      "composer.strip": [
+        {
+          "id": "status",
+          "icon": "wrench",
+          "panel": "purge"
+        }
+      ],
+      "panels": [
+        {
+          "id": "purge",
+          "title": "破甲清洗",
+          "icon": "wrench",
+          "placement": [
+            "chat.panel",
+            "features"
+          ]
+        }
+      ],
+      "composer.tools": [
+        {
+          "id": "apply",
+          "label": {
+            "zh": "应用清洗",
+            "en": "Apply"
+          },
+          "icon": "check"
+        },
+        {
+          "id": "revert",
+          "label": {
+            "zh": "还原",
+            "en": "Revert"
+          },
+          "icon": "refresh"
+        }
+      ]
+    }
+  }
+}

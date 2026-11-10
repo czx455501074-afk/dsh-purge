@@ -8,7 +8,7 @@ const args = process.argv.slice(2);
 function printStatus(state) {
   const out = [];
   out.push("dsh-purge 状态 / Status");
-  out.push("  宿主 / surface " + (state.surface || "web"));
+  out.push("  宿主 / surface " + (state.surface || "web") + (state.dsh_go ? " (dsh-go)" : ""));
   out.push("  DSH_HOME      " + state.dsh_home);
   if (state.desktop_install) out.push("  桌面安装       " + state.desktop_install);
   if (state.ai_base) {
@@ -94,7 +94,11 @@ async function main() {
       console.log("  ⚠ 未定位 shim 目录，跳过注入");
     }
     console.log("");
-    console.log("全部完成 / All done。重启 dsh 生效 / Restart dsh to take effect.");
+    if (state.dsh_go) {
+      console.log("全部完成 / All done。请到 App「引擎」页重启引擎才生效 / restart the engine in the dsh-go app.");
+    } else {
+      console.log("全部完成 / All done。重启 dsh 生效 / Restart dsh to take effect.");
+    }
   } else if (mode === "--revert") {
     if (state.ai_base || core.enumeratePatchAiBases().length) {
       const { reverted, errors } = await core.revertAllHosts();
@@ -110,7 +114,11 @@ async function main() {
       }
     }
     console.log("");
-    console.log("回滚完成 / Revert done。重启 dsh 后恢复 / restart to restore.");
+    if (state.dsh_go) {
+      console.log("回滚完成 / Revert done。请到 App「引擎」页重启引擎后恢复 / restart the engine in the dsh-go app.");
+    } else {
+      console.log("回滚完成 / Revert done。重启 dsh 后恢复 / restart to restore.");
+    }
     console.log("注: prompt-inject.md 保留（用户文件）/ prompt-inject.md kept (user file)");
   } else if (mode === "--uninstall") {
     const { uninstallPurge } = await import("../lib/uninstall.js");
