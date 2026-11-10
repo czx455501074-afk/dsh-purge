@@ -1,3 +1,17 @@
+# 1.2.1
+
+## 中文
+
+- 修复 **1.2.0 在 DSH 0.2.2 上启用后「消息发不出去」**：插件把官方 persona-suffix 换成 `Your working directory is {{cwd}}.`，而 0.2.2 的 `dsh-system-prompt` 只注册 `provider` / `model`，`cwd` 已改成 runtime context；`renderPrompt` 遇到未注册变量直接抛 `unknown prompt variable "{{cwd}}" in section "deployment:persona-suffix"`，每轮 step 1 就 `turn/end error`，界面上表现为发不出去。
+- 现在写的是字面工作目录并标 `interpolate:false`；取不到 cwd 时写 `the session workspace`。组装返回前把各 section 残留的 `{{cwd}}` 全部字面化，插件段 / persona 段的其它 `{{x}}` 拆成 `{ {x}}`，不会再打断宿主提示词渲染。
+- 验证：headless 载入本插件复现，修复前同样报错，修复后请求正常发出（只剩测试 key 的 401）。
+
+## English
+
+- Fixes **"messages cannot be sent"** after enabling 1.2.0 on DSH 0.2.2: the plugin replaced the official persona-suffix with `Your working directory is {{cwd}}.`; 0.2.2 registers only `provider`/`model` (`cwd` became a runtime context), so `renderPrompt` threw `unknown prompt variable "{{cwd}}"` and every turn ended at step 1 with `turn/end error`.
+- The suffix now carries the literal cwd with `interpolate:false` (fallback `the session workspace`); leftover `{{cwd}}` is literalized and stray `{{x}}` in plugin/persona sections is escaped as `{ {x}}`.
+- Verified with headless + dsh-purge: same error before, the request reaches the model after (only the dummy key 401 remains).
+
 # 1.2.0
 
 ## 中文
