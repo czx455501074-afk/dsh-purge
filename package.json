@@ -29,7 +29,6 @@
     "scripts",
     "client.js",
     "cordis.patch.yml",
-    "screenshots.json",
     "README.md",
     "README.zh-CN.md",
     "LICENSE"
@@ -58,11 +57,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YuJunZhiXue/dsh-purge.git"
+    "url": "git+https://github.com/czx455501074-afk/dsh-purge.git"
   },
-  "homepage": "https://github.com/YuJunZhiXue/dsh-purge#readme",
+  "homepage": "https://github.com/czx455501074-afk/dsh-purge#readme",
   "bugs": {
-    "url": "https://github.com/YuJunZhiXue/dsh-purge/issues"
+    "url": "https://github.com/czx455501074-afk/dsh-purge/issues"
   },
   "dsh": {
     "bundle": {
@@ -80,9 +79,9 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.tar.gz",
-      "zip": "https://github.com/YuJunZhiXue/dsh-purge/archive/refs/heads/master.zip",
-      "git": "https://github.com/YuJunZhiXue/dsh-purge.git"
+      "tarball": "https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz",
+      "zip": "https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.zip",
+      "git": "https://github.com/czx455501074-afk/dsh-purge.git"
     }
   },
   "publishConfig": {

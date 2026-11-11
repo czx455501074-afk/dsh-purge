@@ -7,7 +7,7 @@ dsh-go 手机 App 的对话界面是 Flutter 原生界面，不加载 Harness �
 
 ```sh
 # 1) dsh-purge 本体（和网页版同一个包）
-dsh plugin --profile web add dsh-purge
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
 
 # 2) 原生面板：复制到 dsh-go 的插件目录再装
 P="${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/dsh-go-purge"
