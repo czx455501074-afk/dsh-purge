@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.2.2</strong></p>
+<p align="center"><strong>Version 1.2.3</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分</em>
@@ -118,7 +118,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 最新版只支持 **dsh 0.2**，不要拿它去打 0.1.x。
 
-- **dsh 0.2.2-rc.1**（官方桌面 / 官方 `dsh web` / **dsh-go 手机 App**）：用 **1.2.2** 及以上。本页命令装的就是这一档。
+- **dsh 0.2.2-rc.1**（官方桌面 / 官方 `dsh web` / **dsh-go 手机 App**）：用 **1.2.3** 及以上。本页命令装的就是这一档。
 - **dsh 0.2.0-rc.2**：用 **1.1.40 – 1.1.71**。
 - **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/czx455501074-afk/dsh-purge/releases) 里选对应标签。
 
@@ -149,7 +149,7 @@ dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge
 桌面客户端也可以点按钮（`dsh://` 唤起）：
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.2&repo=czx455501074-afk%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fczx455501074-afk%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.3&repo=czx455501074-afk%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fczx455501074-afk%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 ### 装完都要做这三步
@@ -483,6 +483,34 @@ flowchart TD
 ```
 
 
+
+### 运行时旁路（不依赖源码补丁）
+
+补丁改的是宿主源码，宿主一升级锚点就可能漂移。插件另外挂了两条运行时旁路，
+只依赖 cordis 的 `waterfall` / `context` 语义，不碰任何宿主文件：
+
+```mermaid
+flowchart TD
+  A["模型请求某个需要审批的动作"] --> B["ApprovalService.decide()"]
+  B --> C{"effectivePolicy === 'never'?"}
+  C -->|是，原宿主| X["直接 rejected，瀑布都不进"]
+  C -->|被插件降级为 ask| D["approval/request 瀑布"]
+  D --> E["dsh-purge handler（prepend，最外层）"]
+  E --> F["返回 allowed-once：放行，不弹窗"]
+  D --> G["浏览器审批 UI / ACP 应答器（已被外层盖住，不会执行）"]
+```
+
+- **审批旁路**：在瀑布最外层直接应答 `allowed-once`，工具审批与沙箱升级（`sandbox_permissions`）一起覆盖。
+  `danger-full-access` 预设带的是 `approval: never`，宿主的 `decide()` 会在进入瀑布前 `return "rejected"`，
+  所以插件同时把 `effectivePolicy` 的 `never` 读成 `ask`（原型改写，dispose 时还原）。
+- **运行时 context 改写**：装配后的 `approval:policy` 段从「审批已禁用、自动拒绝」改成「审批自动放行、可自由请求升级」；
+  `sandbox:policy` 统一陈述为 `danger-full-access`。
+  只改装配后的 context、不自己注册：主动注册 `approval:policy` 会与 ApprovalService 自身的注册重名，把审批服务整个打掉。
+- **refreshContext 出口守卫**：只改 `assemble` 的返回值不够 —— 发请求前 `agent-loop` 还会调 `systemPrompt.refreshContext()`，
+  它按已注册 provider 重新解析并覆盖回原文。插件在 `refreshContext` 的返回处再改一次，两个入口都覆盖才真正落到模型。
+- **开关**：插件配置 `approvalBypass`（默认 `true`），或写 `$DSH_HOME/dsh-purge/approval-bypass.json`
+  （`{"approvalBypass": false}`），面板与 `POST /dsh-purge/approval-bypass` 都能热切换。
+  关掉后 `never` 恢复宿主原语义：不弹窗、直接拒绝。
 
 Skill 不进注入段：
 

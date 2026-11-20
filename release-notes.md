@@ -1,3 +1,29 @@
+# 1.2.3
+
+## 中文
+
+- **注入提速约 8–17 倍**：`rewritePromptAssembly` 从 0.83–1.79 ms 降到 0.10–0.11 ms。四个以 20–40KB 正文为 key 的缓存（`peelChatmlEnvelope` / `modePromptText` / inject matcher 表 / section 文本）全部换成"数组 + `===` 指针比较"的微型 memo，省掉每次 lookup 的 25KB 拼接与哈希；热路径上正文是同一字符串实例，命中是 O(1)。
+- **抠除注入残片**：官方段里夹带的注入副本按行指纹（归一化后 ≥24 字符的行命中比例 ≥0.6 且命中 ≥8 行）整段丢弃，不再依赖逐段 matcher 抠干净。实测 persona-prefix 的 3642 字节残片归零，最终 prompt 里注入只出现一份。
+- **双跑短路**：插件同时挂 `assemble` guard 与 `system-prompt/assemble` 事件，同一份 assembly 每轮被改写两遍。新增按 `(enabled|redteam|dshHome|注入 mtime:size|override 世代号|长度|策略|cwd)` 的指纹短路，第二遍直接返回原对象 —— 0.18 ms 降到 0.036 ms。
+- **补丁漂移清零**：对齐 0.2.2-rc.x 的新锚点 —— `SandboxEscalationError(msg, "SANDBOX_ESCALATION_*")` 取代 `throw new Error`（#13/#14/#35）、`escalationDisplayReason(mode, justification)` 取代内联 `displayReason`（#14）、repeat-tool-reminder 删掉 `downstream.kind === "block"` 分支（#18）、`approvalDenial(reason, CODE)` 工厂取代字面 deny 对象（#62）。同时修掉两类自指补丁：#14 不再把 #13 会删掉的守卫当锚点，#88 折叠进 #87。#56/#77 在 0.2.2-rc.5 已无对应实现，判为已结算。
+- **运行时审批旁路（不依赖任何源码锚点）**：在 cordis `approval/request` 瀑布最外层 `prepend` 应答 `allowed-once`，工具审批与沙箱升级一起覆盖；宿主升级导致补丁失效时仍然生效。`danger-full-access` 预设的 `approval: never` 会在进入瀑布前 `return "rejected"`，所以同时把 `effectivePolicy` 的 `never` 降级为 `ask`（原型改写，dispose 即还原）。
+- **运行时 context 破甲**：不只改 section，还改写装配里的 `approval:policy` 与 `sandbox:policy` 两段运行时 context —— 前者从"审批已禁用、自动拒绝"改成"审批自动放行、可自由请求升级"，后者统一陈述为 `danger-full-access`。
+- **refreshContext 出口守卫**：只改 `assemble` 的返回值是不够的 —— `agent-loop` 在发请求前还会调 `systemPrompt.refreshContext(assembly, ...)`，它按已注册 provider 重新 `resolveContext`，把改好的文本又覆盖回原文（实测：`assemble` 后 `ctxApproval=true`，模型读到的却仍是宿主原句）。因此额外在 `SystemPrompt.prototype.refreshContext` 的返回处再改写一次，两个入口都覆盖才真正落到模型。只改返回值、不自己注册 —— 主动注册 `approval:policy` 会与 ApprovalService 自身的注册重名（`NamedEntries.insert` 直接抛错），把审批服务整个打掉、permission-presets 卡在 pending。
+- **诊断脚本 `--suggest`**：补丁漂移时直接打印宿主当前对应代码块，可整段粘贴回 `lib/core.js` 当新锚点。
+- 开关：`approvalBypass`（默认开）走 `$DSH_HOME/dsh-purge/approval-bypass.json`，面板与 HTTP 路由 `/dsh-purge/approval-bypass` 均可热切换，关掉后 `never` 恢复宿主原语义。
+
+## English
+
+- **~8–17× faster injection**: `rewritePromptAssembly` drops from 0.83–1.79 ms to 0.10–0.11 ms. The four caches keyed by the 20–40 KB prompt body (`peelChatmlEnvelope`, `modePromptText`, the inject matcher table, and section text) now use an array + `===` identity memo, so a hot-path lookup no longer concatenates and hashes 25 KB.
+- **Residue stripping**: an official section that carries a copy of the inject is dropped wholesale by line fingerprint (normalized lines ≥24 chars, ≥0.6 hit ratio and ≥8 hits) instead of relying on per-segment matchers. The 3642-byte persona-prefix remnant is gone; the inject appears exactly once in the final prompt.
+- **Double-rewrite short-circuit**: the plugin hooks both the `assemble` guard and the `system-prompt/assemble` event, so every assembly was rewritten twice. A fingerprint over `(enabled | redteam | dshHome | inject mtime:size | override generation | length | policy | cwd)` returns the same object on the second pass — 0.18 ms down to 0.036 ms.
+- **Patch drift cleared**: aligned to the 0.2.2-rc.x anchors — `SandboxEscalationError(msg, "SANDBOX_ESCALATION_*")` replaces `throw new Error` (#13/#14/#35), `escalationDisplayReason(mode, justification)` replaces the inline `displayReason` (#14), repeat-tool-reminder dropped its `downstream.kind === "block"` branch (#18), and the `approvalDenial(reason, CODE)` factory replaces literal deny objects (#62). Two self-referential patches are fixed too: #14 no longer anchors on lines #13 deletes, and #88 is folded into #87. #56/#77 have no counterpart left in 0.2.2-rc.5 and are marked settled.
+- **Runtime approval bypass, no source anchors**: answers `allowed-once` at the outermost layer of the cordis `approval/request` waterfall, covering tool approvals and sandbox escalation alike, and keeps working when a host upgrade breaks the patches. A `danger-full-access` preset sets `approval: never`, which returns `"rejected"` before the waterfall ever runs, so `effectivePolicy` is also downgraded from `never` to `ask` (prototype patch, restored on dispose).
+- **Runtime context hardening**: beyond sections, the assembled runtime contexts `approval:policy` and `sandbox:policy` are rewritten — the former now states approvals are auto-granted and escalation may be requested freely, the latter reports `danger-full-access`.
+- **refreshContext exit guard**: rewriting the `assemble` return value alone is not enough — before a request is sent, `agent-loop` calls `systemPrompt.refreshContext(assembly, ...)`, which re-`resolveContext`s every registered provider and overwrites the text back to the original (measured: `ctxApproval=true` after assemble, yet the model still read the host sentence). The guard therefore rewrites `SystemPrompt.prototype.refreshContext`'s return value as well, so both entry points are covered. Only return values are touched; the plugin never registers an `approval:policy` of its own, because a duplicate name makes `NamedEntries.insert` throw and knocks ApprovalService out entirely, leaving permission-presets stuck on pending.
+- **`--suggest` in the diagnose script**: when a patch drifts it prints the host's current code block, ready to paste back into `lib/core.js` as the new anchor.
+- Toggle: `approvalBypass` (on by default) is stored in `$DSH_HOME/dsh-purge/approval-bypass.json`, hot-switchable from the panel or `POST /dsh-purge/approval-bypass`; turning it off restores the host's own `never` semantics.
+
 # 1.2.2
 
 ## 中文

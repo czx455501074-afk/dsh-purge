@@ -28,7 +28,10 @@ const onlyIds = new Set(
     .filter((n) => Number.isFinite(n) && n > 0)
 );
 const asJson = args.includes("--json");
-const showDrift = args.includes("--drift") ||!asJson;
+// --suggest：对所有漂移 replacement 都输出「可粘贴的新锚点」整段，
+// 而不是只给前两条近似行。--json 时也跟着写进 suggest 字段。
+const suggest = args.includes("--suggest");
+const showDrift = args.includes("--drift") || !asJson || suggest;
 
 const aiBase = baseArg || core.findAiBase();
 if (!aiBase) {
@@ -110,6 +113,20 @@ function driftCandidate(text, pattern) {
   };
 }
 
+/**
+ * 漂移时给出「可粘贴的新锚点」：从近似行开始，按原锚点的行数截一段上游原文。
+ * 原来只打印一行 upstream，改锚点的人还得自己去文件里翻上下文；现在直接给出
+ * 整段（保缩进、保空行），copy 进 replacements[i].pattern 就能用。
+ */
+function upstreamBlock(text, pattern, startLineNo, wantLines) {
+  const needle = asLf(pattern);
+  if (!needle) return [];
+  const lines = asLf(text).split("\n");
+  const start = Math.max(0, (startLineNo || 1) - 1);
+  const span = Math.max(1, Math.min(wantLines || needle.split("\n").filter((s) => s.trim()).length, 24));
+  return lines.slice(start, start + span);
+}
+
 const rows = [];
 for (const p of core.ALL_PATCHES) {
   if (onlyIds.size && !onlyIds.has(p.id)) continue;
@@ -141,10 +158,13 @@ for (const p of core.ALL_PATCHES) {
         else drifts.push(i + 1);
       }
       const drift = [];
-      if (showDrift && drifts.length && !marker) {
-        for (const idx of drifts.slice(0, 2)) {
+      if ((showDrift || suggest) && drifts.length && !marker) {
+        const limit = suggest ? drifts.length : 2;
+        for (const idx of drifts.slice(0, limit)) {
           const cand = driftCandidate(text, reps[idx - 1].pattern);
-          if (cand) drift.push({ replacement: idx, ...cand });
+          if (!cand) continue;
+          const block = upstreamBlock(text, reps[idx - 1].pattern, cand.lineNo, cand.total);
+          drift.push({ replacement: idx, ...cand, suggestLines: block, suggest: block.join("\n") });
         }
       }
       fileRows.push({
@@ -208,6 +228,10 @@ if (asJson) {
         console.log("        · replacement #" + d.replacement + " 近似行 " + d.lineNo + " (" + d.matched + "/" + d.total + " 行相同)");
         console.log("          原锚点: " + d.needle);
         console.log("          新原文: " + d.upstream);
+        if (suggest && Array.isArray(d.suggestLines) && d.suggestLines.length) {
+          console.log("          ↓ 可粘贴的新锚点（" + rel + ":" + d.lineNo + " 起 " + d.suggestLines.length + " 行）");
+          for (const line of d.suggestLines) console.log("          |" + line);
+        }
       }
       if ((f.driftReplacements || []).length && (!f.drift || f.drift.length === 0)) {
         console.log("        · 未命中 replacement: " + f.driftReplacements.join(", "));

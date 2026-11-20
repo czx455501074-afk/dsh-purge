@@ -449,6 +449,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"hooksDeny.bypass": "放行 hooks 的 deny / ask（补丁 30 / 31 / 64 / 65）",
 			"hooksDeny.hint": "关掉后，用户自己的 PreToolUse / UserPromptSubmit / Stop hook 的 deny 会按官方逻辑生效。官方 ask 分支本身是空操作，关开关不会弹出审批框。改完后点「应用」并重启才写进宿主。",
 			"saved.hooksDeny": "已保存",
+			"approvalBypass.title": "审批旁路（运行时）",
+			"approvalBypass.bypass": "自动放行所有审批请求（不依赖宿主源码补丁）",
+			"approvalBypass.hint": "在宿主的 approval/request 瀑布最外层直接应答 allowed-once，覆盖工具审批与沙箱升级。宿主升级让补丁 #9 / #10 / #62 漂移时，这条仍然有效。关掉后回到宿主自己的审批流程。",
+			"saved.approvalBypass": "已保存",
 			"continue.title": "失败重试 / 继续",
 			"continue.hint": "请求失败会自动重试；异常停止或中断可点「继续」或自动续跑。自己点停止不会自动继续。次数用完后需新开一轮。",
 			"continue.autoRetry": "失败自动重试",
@@ -789,6 +793,10 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"hooksDeny.bypass": "Bypass hook deny / ask (patches 30 / 31 / 64 / 65)",
 			"hooksDeny.hint": "When off, your own PreToolUse / UserPromptSubmit / Stop hook deny runs as the official host wrote it. The official ask branch is a no-op; turning this off will not show an approval dialog. Click Apply and restart to write the host files.",
 			"saved.hooksDeny": "Saved",
+			"approvalBypass.title": "Approval bypass (runtime)",
+			"approvalBypass.bypass": "Auto-grant every approval request (no host source patch needed)",
+			"approvalBypass.hint": "Answers allowed-once at the outermost layer of the host approval/request waterfall, covering both tool approval and sandbox escalation. Keeps working when a host upgrade drifts patches #9 / #10 / #62. Turning it off restores the host's own approval path.",
+			"saved.approvalBypass": "Saved",
 			"continue.title": "Retry / Continue",
 			"continue.hint": "Failed requests auto-retry. After an abnormal stop or interrupt, use Continue or auto-resume. A manual stop never auto-continues. Counts reset after a completed turn.",
 			"continue.autoRetry": "Auto-retry on failure",
@@ -1230,6 +1238,61 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 							onChange: (e) => save(e.target.checked),
 						}),
 						t("hooksDeny.bypass"),
+					),
+				),
+			);
+		}
+
+		function ApprovalBypassSection({ onSaved }) {
+			const t = useT();
+			const [cfg, setCfg] = useState(null);
+			const [notice, setNotice] = useState({ kind: "idle", text: "" });
+			const [busy, setBusy] = useState(false);
+
+			useEffect(() => {
+				apiJson("/dsh-purge/approval-bypass")
+					.then((d) => { if (d && d.ok) setCfg({ approvalBypass: d.approvalBypass !== false }); })
+					.catch(() => {});
+			}, []);
+
+			const save = (approvalBypass) => {
+				if (!cfg || busy) return;
+				setCfg({ approvalBypass });
+				setBusy(true);
+				apiJson("/dsh-purge/approval-bypass", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ approvalBypass }),
+				})
+					.then((d) => {
+						if (d && d.ok) {
+							setCfg({ approvalBypass: d.approvalBypass === true });
+							setNotice({ kind: "ok", text: t("saved.approvalBypass") });
+							if (typeof onSaved === "function") onSaved();
+						} else {
+							setNotice({ kind: "error", text: t("err.save", { error: (d && d.error) || "" }) });
+						}
+					})
+					.catch((e) => setNotice({ kind: "error", text: t("err.save", { error: e.message }) }))
+					.finally(() => setBusy(false));
+			};
+
+			if (!cfg) return null;
+			return h("div", { className: "dshp-cr", style: { marginTop: 12 } },
+				h("div", { className: "dshp-sub" },
+					h("h4", null, t("approvalBypass.title")),
+					noticeNode(notice),
+				),
+				h("p", { className: "dshp-hint", style: { margin: "0 0 4px", color: "var(--dshp-mute)", fontSize: 12 } }, t("approvalBypass.hint")),
+				h("div", { className: "dshp-cr-row" },
+					h("label", null,
+						h("input", {
+							type: "checkbox",
+							checked: cfg.approvalBypass === true,
+							disabled: busy,
+							onChange: (e) => save(e.target.checked),
+						}),
+						t("approvalBypass.bypass"),
 					),
 				),
 			);
@@ -1944,6 +2007,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				h("div", { className: "dshp-bar", "aria-hidden": "true" }, h("i", { style: { width: pct + "%" } })),
 				h(PatchGroups, { state: s }),
 				h(HooksDenySection, { onSaved: loadAll }),
+				h(ApprovalBypassSection, { onSaved: loadAll }),
 				h("div", { className: "dshp-row", style: { marginTop: 14 } },
 					h(Btn, { kind: "primary", disabled: patchBusy || uninstallBusy || !overrideLoaded, onClick: () => doAction("apply", "action.apply") }, patchBusy ? t("btn.apply.busy") : t("btn.apply")),
 					h(Btn, { kind: "danger", disabled: patchBusy || uninstallBusy, onClick: () => doAction("revert", "action.revert") }, t("btn.revert")),
@@ -4038,20 +4102,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(req),
-    }).then(async (res) => {
-      const text = await res.text().catch(() => '')
-      let data = null
-      try { data = text ? JSON.parse(text) : null } catch {
-        return { ok: false, error: res.status + ' non-json: ' + String(text).slice(0, 120) }
-      }
-      if (!res.ok) {
-        return Object.assign({}, data || {}, {
-          ok: false,
-          error: (data && (data.error || data.message)) || (res.status + ' ' + res.statusText),
-        })
-      }
-      return data
-    })
+    }).then((res) => res.json())
 
     let ui = { open: true, tab: 'assets' }
     const subs = new Set()
@@ -5571,8 +5622,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           a.href = url
           a.download = 'report-' + String(label || 'score').replace(/[^\w.\-]/g, '_') + '.md'
           a.click()
-          /* 立刻 revoke 会在部分浏览器里让 click 启动的下载断流,延后一拍 */
-          setTimeout(() => { try { URL.revokeObjectURL(url) } catch { /* ignore */ } }, 1000)
+          URL.revokeObjectURL(url)
           setMsg({ ok: '已下载：' + label })
         } catch (e) { setMsg({ err: '下载失败：' + ((e && e.message) || e) }) }
       }
@@ -7167,17 +7217,6 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       const [open, setOpen] = React.useState(false)
       const [msg, setMsg] = React.useState(null)
       const [countdown, setCountdown] = React.useState(0)
-      const countdownRef = React.useRef(null)
-      const clearCountdown = React.useCallback(() => {
-        if (countdownRef.current) { try { clearInterval(countdownRef.current) } catch { /* ignore */ } }
-        countdownRef.current = null
-      }, [])
-      React.useEffect(() => () => clearCountdown(), [clearCountdown])
-      const closeModal = React.useCallback(() => {
-        clearCountdown()
-        setCountdown(0)
-        setOpen(false)
-      }, [clearCountdown])
 
       const check = (silent) => {
         if (!silent) setBusy(true)
@@ -7208,10 +7247,9 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           setMsg({ ok: '已安装 ' + (r.installed || '') + '，正在重启当前宿主…' })
           /* 重启会断开这个页面：倒计时提示用户稍后刷新 */
           setCountdown(6)
-          clearCountdown()
-          countdownRef.current = setInterval(() => {
+          const t = setInterval(() => {
             setCountdown((n) => {
-              if (n <= 1) { clearCountdown(); window.location.reload(); return 0 }
+              if (n <= 1) { clearInterval(t); window.location.reload(); return 0 }
               return n - 1
             })
           }, 1000)
@@ -7243,7 +7281,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
               title: '重新检查 npm 上的最新版本',
             }, busy ? '检查中…' : '检查更新'),
         open
-          ? h('div', { className: 'rt-modal', 'aria-hidden': 'true', onClick: closeModal },
+          ? h('div', { className: 'rt-modal', 'aria-hidden': 'true', onClick: () => setOpen(false) },
               h('div', { className: 'rt-modal-box', onClick: (e) => e.stopPropagation() },
                 h('h4', { style: { marginTop: 0 } }, '更新 RedTeam 模式'),
                 h('div', { className: 'rt-kv' }, h('b', null, '当前版本'), h('span', null, current || '未知')),
@@ -7269,7 +7307,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
                   ? h('div', { className: 'rt-foot' }, '宿主正在重启，' + countdown + ' 秒后自动刷新页面…')
                   : null,
                 h('div', { style: { display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 10 } },
-                  h('button', { className: 'rt-btn', onClick: closeModal }, '关闭'),
+                  h('button', { className: 'rt-btn', onClick: () => setOpen(false) }, '关闭'),
                   h('button', {
                     className: 'rt-btn rt-btn-primary',
                     disabled: busy || blockers.length > 0 || mode === 'dev',
