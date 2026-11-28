@@ -34,14 +34,18 @@ const badUrls = urls.filter((u) => /github\.com\/[^/]+\/dsh-purge(?!-czx)/.test(
 ok(badUrls.length === 0, "manifest URLs point at dsh-purge-czx" + (badUrls.length ? " :: " + badUrls.join(" ") : ""));
 
 const client = read("client.js");
-ok(client.includes('id: "dsh-purge-czx-overlay"'), "overlay id renamed to dsh-purge-czx-overlay");
-ok(!client.includes('id: "dsh-purge-czx-dock"'), "old dock overlay id removed");
+ok(!client.includes('ctx.slots.inject("shell.overlay"'), "no shell.overlay registration (settings page is the only entry)");
+ok(!client.includes("__dshPurgeDrill"), "no embedded drill bundle in client");
+ok(!client.includes("drill-grant"), "no drill-grant references in client");
 ok(!/h\(WelcomeNotice\)|h\(PurgeLauncher\)|h\(HeroNewSessionMount\)|h\(TabRowPurgeMount\)/.test(client), "no launcher/chip mounts in overlay");
 ok(!client.includes('inject("conversation.input.right"'), "composer (input.right) button removed");
 ok(client.includes('inject("settings.section"'), "settings.section registered");
 ok(client.includes("function PurgeSettingsPage"), "PurgeSettingsPage component present");
 ok(client.includes('label: () => t("nav.title")'), "settings section label wired");
-ok(client.includes("/* __DSH_PURGE_DRILL_BEGIN__ */") && client.includes("/* __DSH_PURGE_DRILL_END__ */"), "drill embed markers intact");
+ok(!client.includes("__DSH_PURGE_DRILL_BEGIN__"), "drill embed markers removed");
+for (const gone of ["lib/redteam", "presets/redteam", "skills/redteam", "lib/drill-grant.js", "scripts/build-client.mjs"]) {
+  ok(!existsSync(join(root, gone)), "removed " + gone);
+}
 ok(!/setInterval\(sync, 1500\)/.test(client), "dock 1.5s theme polling removed");
 const bytes = statSync(join(root, "client.js")).size;
 ok(bytes < 600 * 1024, "client.js under 600KB (" + Math.round(bytes / 1024) + "KB)");
@@ -71,7 +75,7 @@ for (const f of ["universal.md", "claude.md", "gpt.md", "gemini.md", "grok.md", 
 ok(!existsSync(join(root, "bin/dsh-purge.js")), "old bin/dsh-purge.js removed");
 ok(existsSync(join(root, "bin/dsh-purge-czx.js")), "bin/dsh-purge-czx.js present");
 
-for (const f of ["client.js", "lib/index.js", "lib/core.js", "lib/identity.js", "bin/dsh-purge-czx.js", "scripts/build-client.mjs"]) {
+for (const f of ["client.js", "lib/index.js", "lib/core.js", "lib/identity.js", "bin/dsh-purge-czx.js", "lib/model-adapt.js", "scripts/test-model-adapt.mjs"]) {
   const r = spawnSync(process.execPath, ["--check", join(root, f)], { encoding: "utf8" });
   ok(r.status === 0, "syntax " + f + (r.status ? " :: " + String(r.stderr || "").split("\n")[0] : ""));
 }

@@ -70,9 +70,9 @@ Harness does more than forward a prompt. It rewrites prompts, approval gates, sa
 
 | You get | What it does |
 |---|---|
-| **dsh-purge-czx settings page** | The only entry point: **Settings → dsh-purge-czx**. Two tabs: Clean and Drill. No floating button anywhere in the session |
+| **dsh-purge-czx settings page** | The only entry point: **Settings → dsh-purge-czx**. Two tabs: Clean and Model prompts. No floating button anywhere in the session |
 | **Clean** | Grouped patch status, Apply / Restore / Uninstall, prompt editor, multiple rule sets |
-| **Drill** | Built into the stable release. After authorization: assets, skills, and the local environment. Only for a host you manage, an offline target, or a written authorized exercise |
+| **Model prompts** | Auto-composes a per-model jailbreak pack (universal backbone + 13 families); switch auto / universal / family / off |
 | **Host policy** | Default copy, permission policy, and tool limits. Official capabilities stay. No second invented identity |
 | **On start** | Checks and reapplies. After npm overwrites `node_modules`, you do not hand-edit files |
 
@@ -338,15 +338,15 @@ Plugin config lives in `cordis.patch.yml` (`postPrompt` is empty by default):
 
 ## UI
 
-**dsh-purge-czx** lives under DSH **Settings**. That page is the only entry: a two-tab console, **Clean** and **Drill**. No floating button, no chip in the composer, no badge in the tab row. Switch **Light / Ink**. Patches are grouped; the count only includes items that actually applied. Rule sets sit in a list above the editor, with Enable and Delete on each row.
+**dsh-purge-czx** lives under DSH **Settings**. That page is the only entry: a two-tab console, **Clean** and **Model prompts**. No floating button, no chip in the composer, no badge in the tab row. Switch **Light / Ink**. Patch groups expand, and progress counts only what is really applied. Rule sets enable or delete in the list above, and you edit the body below.
 
-The first time you open Drill you read the notice, wait out the countdown, scroll to the end, and check three boxes. Clean does not need that step. Drill is only for a host you manage, an offline target, or an exercise that already has written authorization.
+The Model prompts tab picks a family from the session model id, or you can pin one; files live under `$DSH_HOME/dsh-purge-czx/model-prompts/` and are editable in place. Clean needs no authorization step.
 
 | Area | What it shows |
 |---|---|
 | dsh-purge-czx | the only entry: DSH Settings → dsh-purge-czx |
 | Clean | the old Rules page: patches, prompt, rule sets, skills |
-| Drill | assets, skills, and environment after authorization. The tab says Unauthorized until then |
+| Model prompts | family detection, mode switch (auto / universal / family / off), and overlay size |
 | Patches | grouped status, Apply, Restore, or Uninstall |
 | Prompt | edit `prompt-inject.md` as the session override |
 | Own servers | one IP or exact hostname per line, saved to `$DSH_HOME/net-scope-allow.txt` |
@@ -357,9 +357,9 @@ The first time you open Drill you read the notice, wait out the countdown, scrol
 
 ## Layout
 
-`bin/` is the CLI, `lib/` is patches and the drill console, `presets/redteam/` is the red-team preset, `skills/redteam/` is the bundled skills, and `client.js` is the Settings page console.
+`bin/` is the CLI, `lib/` is patches and prompt injection, `presets/model-prompts/` is the per-model jailbreak packs, and `client.js` is the Settings page console.
 
-Runtime files live under `$DSH_HOME`: `prompt-inject.md`, `rules/`, `skills/`, `net-scope-allow.txt`, `redteam/`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`. Web and the desktop app each use their own home. Skills are not part of the inject section and do not replace the prompt.
+Runtime files live under `$DSH_HOME`: `prompt-inject.md`, `rules/`, `skills/`, `net-scope-allow.txt`, `dsh-purge-czx/` (model prompts and config). If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`. Web and the desktop app each use their own home. Skills never enter the inject section and never replace the prompt.
 
 ---
 

@@ -22,7 +22,7 @@
 - 压缩包：<https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz>
 - 已在仓库目录里：把地址换成 `add .`
 
-`package.json` 的 `repository` / `homepage` / `bugs` / `dsh.install`（tarball、zip、git）全部指向本仓库；插件内更新检查（`lib/update.js`、`lib/redteam/ui.js`）与侧栏欢迎链接（`client.js`）同样指向本仓库，不再回上游。
+`package.json` 的 `repository` / `homepage` / `bugs` / `dsh.install`（tarball、zip、git）全部指向本仓库；插件内更新检查（`lib/update.js`）与侧栏欢迎链接（`client.js`）同样指向本仓库，不再回上游。
 
 ## 三、本副本相对上游的文档改动
 

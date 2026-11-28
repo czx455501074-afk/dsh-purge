@@ -1,3 +1,21 @@
+# 2.2.0
+
+## 中文
+
+- **删除红队演练台**：整套移除 `lib/redteam/`、`presets/redteam/`、`skills/redteam/`、`lib/drill-grant.js`、`scripts/build-client.mjs`，以及 `/dsh-purge-czx/drill-grant` 路由与 `cordis.patch.yml` 里的 redteam 模块注册。
+- **界面只留一个入口**：设置页 `dsh-purge-czx` 仅两个页签——**清洗**、**模型提示词**。删除会话输入框右上角按钮、会话窗口右下角悬浮按钮、首页模式行芯片、对话/轨迹标签栏芯片，以及 `shell.overlay` 浮层与环境门禁。
+- **体积**：`client.js` 从 457KB 降到 156KB，不再内嵌演练台 bundle，也不再需要 `scripts/patch-client-dock.mjs` 二次注入。
+- **卸载路径**：不再清理 `drill-grant.json`；`report.drillGrantCleared` 字段移除。
+- **保留**：提示词层的红队模式判断（`modePromptText` 与 capability 协议）保留，注入行为不变。
+
+## English
+
+- **Drill console removed**: deleted `lib/redteam/`, `presets/redteam/`, `skills/redteam/`, `lib/drill-grant.js`, `scripts/build-client.mjs`, the `/dsh-purge-czx/drill-grant` route, and the redteam module registrations in `cordis.patch.yml`.
+- **Single UI entry**: the `dsh-purge-czx` settings page now has exactly two tabs — **Clean** and **Model prompts**. Removed the composer top-right button, the bottom-right floating button, the home mode-row chip, the tab-row chip, and the `shell.overlay` layer plus env send gate.
+- **Size**: `client.js` drops from 457KB to 156KB; no embedded drill bundle and no `scripts/patch-client-dock.mjs` post-processing.
+- **Uninstall path**: no longer clears `drill-grant.json`; the `report.drillGrantCleared` field is gone.
+- **Kept**: the prompt-layer red-team mode switch (`modePromptText` and the capability protocol) is untouched, so injection behavior is unchanged.
+
 # 2.1.0
 
 ## 中文

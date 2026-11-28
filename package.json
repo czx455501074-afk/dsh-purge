@@ -1,6 +1,6 @@
 {
   "name": "dsh-purge-czx",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分",
   "type": "module",
   "main": "lib/index.js",
@@ -9,10 +9,6 @@
       "default": "./lib/index.js"
     },
     "./client": "./client.js",
-    "./redteam": "./lib/redteam/index.js",
-    "./redteam/store": "./lib/redteam/store.js",
-    "./redteam/ui": "./lib/redteam/ui.js",
-    "./redteam/tools": "./lib/redteam/tools.js",
     "./package.json": "./package.json"
   },
   "bin": {
@@ -25,7 +21,6 @@
     "docs",
     "dsh-go",
     "presets",
-    "skills",
     "scripts",
     "client.js",
     "cordis.patch.yml",
@@ -35,7 +30,6 @@
   ],
   "scripts": {
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
-    "build:client": "node scripts/build-client.mjs",
     "diagnose": "node scripts/diagnose-patches.mjs",
     "check:prompt": "node scripts/check-prompt-render.mjs",
     "verify": "node scripts/verify-release.mjs",
