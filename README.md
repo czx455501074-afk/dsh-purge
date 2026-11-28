@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/banner.svg" alt="dsh-purge" width="720">
+  <img src="docs/banner.svg" alt="dsh-purge-czx" width="720">
 </p>
 
-<h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
+<h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge-czx)</h1>
 
 <p align="center"><strong>Version 1.2.3</strong></p>
 
@@ -11,8 +11,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/czx455501074-afk/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/czx455501074-afk/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
-  <a href="https://github.com/czx455501074-afk/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
+  <a href="https://github.com/czx455501074-afk/dsh-purge-czx/stargazers"><img src="https://img.shields.io/github/stars/czx455501074-afk/dsh-purge-czx?logo=github&label=Stars" alt="GitHub stars"></a>
+  <a href="https://github.com/czx455501074-afk/dsh-purge-czx/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.1-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
@@ -23,13 +23,21 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **This repository is maintained by czx; install and update from it only.** Upstream (original author **YuJunZhiXue**, see [Attribution required](#attribution-required)) has paused releases: no new versions, no issues / PRs. This repo keeps the code and the original author's credit, and serves downloads from [czx455501074-afk/dsh-purge](https://github.com/czx455501074-afk/dsh-purge).
+> **This repository is maintained by czx; install and update from it only.** Upstream (original author **YuJunZhiXue**, see [Attribution required](#attribution-required)) has paused releases: no new versions, no issues / PRs. This repo keeps the code and the original author's credit, and serves downloads from [czx455501074-afk/dsh-purge-czx](https://github.com/czx455501074-afk/dsh-purge-czx).
 
 > **Official Web, the official desktop app, and the dsh-go phone app are supported.** Official `dsh web` uses profile `web`. The official desktop EXE (DeepSeek Harness **0.2.2-rc.1**) uses profile `desktop`. **dsh-go** also uses profile `web`; add the [native panel](dsh-go/README.md) to run Apply from the phone. Install and Apply Web / desktop separately. This release targets dsh 0.2.2. Older dsh builds need the matching older plugin. Community Desktop is not maintained.
 >
-> Adding the plugin to a profile does not patch the host. Click **dsh-purge** beside the session title → **Clean** → **Apply**. A successful Apply restarts; an unfinished Apply does not. After the restart, start a new chat — that is when the inject enters the session.
+> Adding the plugin to a profile does not patch the host. Open **Settings → dsh-purge-czx** → **Clean** → **Apply**. A successful Apply restarts; an unfinished Apply does not. After the restart, start a new chat — that is when the inject enters the session.
 >
-> Node.js **≥18**. Windows no-flash needs **Node ≥22**. The install commands below all point at this repository (`https://github.com/czx455501074-afk/dsh-purge`), not the old npm package.
+> Node.js **≥18**. Windows no-flash needs **Node ≥22**. The install commands below all point at this repository (`https://github.com/czx455501074-afk/dsh-purge-czx`), not the old npm package.
+
+## What's new in 2.0
+
+- **One entry point.** The floating button (bottom-right), the hero chip, the tab-row chip and the composer button are gone. Everything lives in **Settings → dsh-purge-czx**.
+- **Renamed** to `dsh-purge-czx`: install URLs, bundle patch ids, state directory, locale namespace and log prefixes all follow.
+- **Compatibility.** `engines.dsh` (`>=0.2.2-rc.1 <0.3.0`) replaces the old `dshTarget` field; the state directory migrates from `$DSH_HOME/dsh-purge` on first boot.
+- **Performance.** Dropped the 1.5 s dock polling and the 1 s hero / tab-row DOM polling; theme follows `prefers-color-scheme` plus one mutation observer.
+- **Diagnostics.** New `purge_doctor` tool: versions, patch anchor health, legacy entries, bundle size.
 
 ## Contents
 
@@ -48,19 +56,19 @@
 
 ## What this is
 
-**dsh-purge** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine. Official **Web** (`dsh web`) and the official **desktop EXE** are both supported. Install and Apply them separately.
+**dsh-purge-czx** is a cybersecurity red-team plugin for the official [DeepSeek Harness](https://www.deepseek.com/harness/) already installed on your machine. Official **Web** (`dsh web`) and the official **desktop EXE** are both supported. Install and Apply them separately.
 
 Harness does more than forward a prompt. It rewrites prompts, approval gates, sandbox policy, and session migration at runtime. Asking only “will the model answer” treats a host-layer block as a model refusal. This plugin separates those two layers on your own install, for controlled evaluation and for seeing which default policy is too tight.
 
 | You get | What it does |
 |---|---|
-| **dsh-purge dock** | A button beside the session title opens the right dock. Two pages: Clean and Drill |
+| **dsh-purge-czx settings page** | The only entry point: **Settings → dsh-purge-czx**. Two tabs: Clean and Drill. No floating button anywhere in the session |
 | **Clean** | Grouped patch status, Apply / Restore / Uninstall, prompt editor, multiple rule sets |
 | **Drill** | Built into the stable release. After authorization: assets, skills, and the local environment. Only for a host you manage, an offline target, or a written authorized exercise |
 | **Host policy** | Default copy, permission policy, and tool limits. Official capabilities stay. No second invented identity |
 | **On start** | Checks and reapplies. After npm overwrites `node_modules`, you do not hand-edit files |
 
-No hardcoded drive letters. It looks at `$DSH_HOME`, `.dsh` next to the dsh launcher, then `~/.dsh`. It does not patch the Harness source tree. **Apply** on the **Clean** page of **dsh-purge** is what writes the changes. Identity comes from the encrypted prompt shipped in the plugin, the text the prompt box shows by default. The host prompt file is not read.
+No hardcoded drive letters. It looks at `$DSH_HOME`, `.dsh` next to the dsh launcher, then `~/.dsh`. It does not patch the Harness source tree. **Apply** on the **Clean** page of **dsh-purge-czx** is what writes the changes. Identity comes from the encrypted prompt shipped in the plugin, the text the prompt box shows by default. The host prompt file is not read.
 
 It only touches the official `@deepseek-ai` packages and local config on the user's machine. It is not a public scanner and not an attack kit for third-party sites. The repo does not ship malware, unauthorized-exploit scripts, or payloads aimed at the public internet.
 
@@ -72,7 +80,7 @@ It only touches the official `@deepseek-ai` packages and local config on the use
 
 **Original author: YuJunZhiXue** (original repo <https://github.com/YuJunZhiXue/dsh-purge>). All rights in the code, prompts, and name stay with the original author; `LICENSE` (MIT) is kept unchanged.
 
-**If you borrow this project's name, ideas, code, or prompts, you must credit the original author and name the source repository:** [czx455501074-afk/dsh-purge](https://github.com/czx455501074-afk/dsh-purge) (original author YuJunZhiXue).
+**If you borrow this project's name, ideas, code, or prompts, you must credit the original author and name the source repository:** [czx455501074-afk/dsh-purge-czx](https://github.com/czx455501074-afk/dsh-purge-czx) (original author YuJunZhiXue).
 
 Using them without attribution, hiding the source, or passing them off as your own will be pursued by the original author.
 
@@ -122,7 +130,7 @@ The latest plugin supports **dsh 0.2** only — do not apply it to 0.1.x.
 
 - **dsh 0.2.2-rc.1** (official desktop / official `dsh web` / **dsh-go phone app**): use **1.2.3** or newer. This page installs that line.
 - **dsh 0.2.0-rc.2**: use **1.1.40 – 1.1.71**.
-- **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/czx455501074-afk/dsh-purge/releases).
+- **dsh 0.1.7** (incl. rc.1 / rc.2): use **1.1.39** or older — pick the tag on [Releases](https://github.com/czx455501074-afk/dsh-purge-czx/releases).
 
 Unmatched patches stay pending or skipped; nothing is rewritten blindly. After changing dsh versions, run `npm run diagnose` (`node scripts/diagnose-patches.mjs`) to see which anchors drifted.
 
@@ -135,23 +143,23 @@ Web and the official desktop EXE are the two maintained hosts. **Install both. A
 **Web (official `dsh web`)**
 
 ```sh
-dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
 **Desktop (official EXE)**
 
 ```sh
-dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
-If this directory is already a clone, use `add .` instead of the URL. If `dsh` is not on PATH, use [Manual install](#manual). Git URL blocked: use the tarball `https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz` with the same `--profile`.
+If this directory is already a clone, use `add .` instead of the URL. If `dsh` is not on PATH, use [Manual install](#manual). Git URL blocked: use the tarball `https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz` with the same `--profile`.
 
-You can also install from the zip: `https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz` — extract, rename `dsh-purge-master` to `dsh-purge`, then `dsh plugin --profile web add <extracted path>` (`--profile desktop` for the desktop app).
+You can also install from the zip: `https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz` — extract, rename `dsh-purge-czx-master` to `dsh-purge-czx`, then `dsh plugin --profile web add <extracted path>` (`--profile desktop` for the desktop app).
 
 For the desktop client you can also click the button (`dsh://` deep link):
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.3&repo=czx455501074-afk%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fczx455501074-afk%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>Install in desktop client</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge-czx&name=dsh-purge-czx&version=1.2.3&repo=czx455501074-afk%2Fdsh-purge-czx&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fczx455501074-afk%2Fdsh-purge-czx%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>Install in desktop client</strong></a>
 </p>
 
 ### After the command: three steps
@@ -159,27 +167,27 @@ For the desktop client you can also click the button (`dsh://` deep link):
 Adding the plugin to a profile does **not** patch `@deepseek-ai` by itself.
 
 1. **Quit and reopen** the host you installed into — stop and restart `dsh web`, quit the desktop tray and reopen that app, or reopen the dsh-go app.
-2. On **that host**, click **dsh-purge** beside the session title, then **Apply** on the **Clean** page. It is not on the host Settings page. On dsh-go use the [native panel](dsh-go/README.md) (composer strip / plus panel).
+2. On **that host**, open **Settings → dsh-purge-czx**, then **Apply** on the **Clean** page. On dsh-go use the [native panel](dsh-go/README.md) (composer strip / plus panel).
 3. A successful **Apply** restarts once so patches load. It does not restart if it did not finish. On dsh-go the plugin never touches the app's engine process — **restart the engine in the app (Settings → Engine)** or reopen the app.
 
 Web controls affect Web only; desktop controls affect the desktop app only. Do not Apply one host from the other.
 
 ### How to tell it installed
 
-- **dsh-purge** sits beside the session title, with **Apply** on its Clean page.
+- **dsh-purge-czx** appears under DSH **Settings**, with **Apply** on its Clean page.
 - `/purge status` in chat prints `DSH_HOME` and the patch list — the path should be the home you actually run.
 - Optional packages that are not installed (liangshen) show as skipped and do not block Apply.
 
 ### dsh-go phone app (native panel)
 
-dsh-go renders a native Flutter UI, not the web sidebar, so the `dsh-purge` button beside the session title never shows up on the phone. Install the native panel from `dsh-go/`:
+dsh-go renders a native Flutter UI, not the web sidebar, so the `dsh-purge-czx` settings page is not available on the phone. Install the native panel from `dsh-go/`:
 
 - a **Purge x/y** strip above the composer, tapping it opens the clean panel;
 - **Apply** / **Revert** in the composer plus panel;
 - progress, pending patch list, and host path in the panel.
 
 ```sh
-dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx
 P="${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/dsh-go-purge"
 mkdir -p "$(dirname "$P")" && cp -r dsh-go "$P"
 dsh plugin --profile web add "$P"
@@ -196,23 +204,23 @@ Paste the block below to a local assistant. It should only run the install comma
 
 <!-- AI-AGENT-START -->
 
-Install the DeepSeek Harness plugin `dsh-purge` into both the Web profile and the official desktop profile. Do not scan the whole disk, do not read or edit other files, do not apply settings, and do not restart the app.
+Install the DeepSeek Harness plugin `dsh-purge-czx` into both the Web profile and the official desktop profile. Do not scan the whole disk, do not read or edit other files, do not apply settings, and do not restart the app.
 
-If `dsh` is not on PATH, tell the user and stop. If this directory is already a clone, use `.` instead of the URL in both commands. If the Git URL fails, use `https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz`. If one profile is missing, skip that command and still install the other.
+If `dsh` is not on PATH, tell the user and stop. If this directory is already a clone, use `.` instead of the URL in both commands. If the Git URL fails, use `https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz`. If one profile is missing, skip that command and still install the other.
 
 **Web (official `dsh web`)**
 
 ```sh
-dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
 **Desktop (official EXE)**
 
 ```sh
-dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
-After the commands finish, tell the user to fully quit and restart `dsh web`, and to quit the desktop tray then reopen the EXE. On each host, open **dsh-purge** beside the session title and **Apply** on **Clean**. Then stop.
+After the commands finish, tell the user to fully quit and restart `dsh web`, and to quit the desktop tray then reopen the EXE. On each host, open **Settings → dsh-purge-czx** and **Apply** on **Clean**. Then stop.
 
 <!-- AI-AGENT-END -->
 
@@ -244,32 +252,32 @@ $cands += @("$env:APPDATA\DeepSeek Harness\dsh-home", "$env:LOCALAPPDATA\DeepSee
 $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_ "profiles")) }
 ```
 
-**2. Put the plugin at `$DSH_HOME/plugins/dsh-purge`** (folder must be named `dsh-purge`, with a `package.json` whose `"name"` is `dsh-purge`).
+**2. Put the plugin at `$DSH_HOME/plugins/dsh-purge-czx`** (folder must be named `dsh-purge-czx`, with a `package.json` whose `"name"` is `dsh-purge-czx`).
 
 ```sh
-git clone https://github.com/czx455501074-afk/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
+git clone https://github.com/czx455501074-afk/dsh-purge-czx.git "$DSH_HOME/plugins/dsh-purge-czx"
 ```
 
-Without git: download [master.tar.gz](https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz), extract, rename `dsh-purge-master` → `dsh-purge`, and place it under `plugins`. If you already have a clone, copy the whole tree — not a few `.js` files.
+Without git: download [master.tar.gz](https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz), extract, rename `dsh-purge-czx-master` → `dsh-purge-czx`, and place it under `plugins`. If you already have a clone, copy the whole tree — not a few `.js` files.
 
 **3. Edit only that profile's `package.json` — back it up first.** Web → `$DSH_HOME/profiles/web/package.json`; desktop → `$DSH_HOME/profiles/desktop/package.json`. Add **only two things**, keeping every existing dependency and bundle:
 
-1. In `dependencies`, add `"dsh-purge": "file:../../plugins/dsh-purge"`
-2. At the **end** of `dsh.profile.bundles`, append `"dsh-purge"` (skip if already there)
+1. In `dependencies`, add `"dsh-purge-czx": "file:../../plugins/dsh-purge-czx"`
+2. At the **end** of `dsh.profile.bundles`, append `"dsh-purge-czx"` (skip if already there)
 
 ```json
 {
   "name": "dsh-profile-web",
   "private": true,
   "dependencies": {
-    "dsh-purge": "file:../../plugins/dsh-purge"
+    "dsh-purge-czx": "file:../../plugins/dsh-purge-czx"
   },
   "dsh": {
     "profile": {
       "bundles": [
         "@deepseek-ai/dsh-base",
         "@deepseek-ai/dsh-web-app",
-        "dsh-purge"
+        "dsh-purge-czx"
       ],
       "patchReload": "live"
     }
@@ -277,7 +285,7 @@ Without git: download [master.tar.gz](https://github.com/czx455501074-afk/dsh-pu
 }
 ```
 
-Keep JSON valid (comma before the new item, none after the last). Do not switch `file:../../plugins/dsh-purge` to an absolute path, do not touch `patchReload` or other plugins, and do not list `"dsh-purge"` twice. On desktop, if there is no `dsh-web-app` row, do not add one.
+Keep JSON valid (comma before the new item, none after the last). Do not switch `file:../../plugins/dsh-purge-czx` to an absolute path, do not touch `patchReload` or other plugins, and do not list `"dsh-purge-czx"` twice. On desktop, if there is no `dsh-web-app` row, do not add one.
 
 **4. Run `pnpm install` in that profile only** (`cd` into the profile dir, not the repo root or `$DSH_HOME`):
 
@@ -286,19 +294,19 @@ cd "$DSH_HOME/profiles/web"   # or profiles/desktop
 pnpm install
 ```
 
-Success: `profiles/<web|desktop>/node_modules/dsh-purge/package.json` exists. If `pnpm` is missing, use the Node / pnpm shipped with official `dsh`; on `Could not resolve`, re-check the `file:` path; on a JSON error, fix commas or restore the backup.
+Success: `profiles/<web|desktop>/node_modules/dsh-purge-czx/package.json` exists. If `pnpm` is missing, use the Node / pnpm shipped with official `dsh`; on `Could not resolve`, re-check the `file:` path; on a JSON error, fix commas or restore the backup.
 
-**5. Fully quit that host, reopen it, then Apply** — same three steps as above. The card appears beside the session title; click **Apply** (or `/purge apply`) on that host only. If the card is missing, you likely edited the other `.dsh` — go back to step 1.
+**5. Fully quit that host, reopen it, then Apply** — same three steps as above. The card appears under DSH Settings; click **Apply** (or `/purge apply`) on that host only. If the card is missing, you likely edited the other `.dsh` — go back to step 1.
 
 </details>
 
 ### Uninstall
 
-**dsh-purge** beside the session title → **Clean** → **Uninstall**. Confirm the dialog: it reverts any applied patches, restores the original Harness, and restarts the current host.
+**Settings → dsh-purge-czx** → **Clean** → **Uninstall**. Confirm the dialog: it reverts any applied patches, restores the original Harness, and restarts the current host.
 
 ```sh
 # or from a terminal / chat
-dsh-purge --uninstall
+dsh-purge-czx --uninstall
 # /purge uninstall
 ```
 
@@ -306,8 +314,8 @@ Plugin config lives in `cordis.patch.yml` (`postPrompt` is empty by default):
 
 ```yaml
 - insert:
-    - id: dsh-purge
-      name: 'dsh-purge'
+    - id: dsh-purge-czx
+      name: 'dsh-purge-czx'
       config:
         enabled: true
         autoApplyOnStart: true
@@ -322,13 +330,13 @@ Plugin config lives in `cordis.patch.yml` (`postPrompt` is empty by default):
 
 ## UI
 
-**dsh-purge** sits beside the session title. It opens a right-hand dock with two pages: **Clean** and **Drill**. Switch **Light / Ink**. Patches are grouped; the count only includes items that actually applied. Rule sets sit in a list above the editor, with Enable and Delete on each row.
+**dsh-purge-czx** lives under DSH **Settings**. That page is the only entry: a two-tab console, **Clean** and **Drill**. No floating button, no chip in the composer, no badge in the tab row. Switch **Light / Ink**. Patches are grouped; the count only includes items that actually applied. Rule sets sit in a list above the editor, with Enable and Delete on each row.
 
 The first time you open Drill you read the notice, wait out the countdown, scroll to the end, and check three boxes. Clean does not need that step. Drill is only for a host you manage, an offline target, or an exercise that already has written authorization.
 
 | Area | What it shows |
 |---|---|
-| dsh-purge | button beside the session title; opens or collapses the dock |
+| dsh-purge-czx | the only entry: DSH Settings → dsh-purge-czx |
 | Clean | the old Rules page: patches, prompt, rule sets, skills |
 | Drill | assets, skills, and environment after authorization. The tab says Unauthorized until then |
 | Patches | grouped status, Apply, Restore, or Uninstall |
@@ -341,7 +349,7 @@ The first time you open Drill you read the notice, wait out the countdown, scrol
 
 ## Layout
 
-`bin/` is the CLI, `lib/` is patches and the drill console, `presets/redteam/` is the red-team preset, `skills/redteam/` is the bundled skills, and `client.js` is the dock.
+`bin/` is the CLI, `lib/` is patches and the drill console, `presets/redteam/` is the red-team preset, `skills/redteam/` is the bundled skills, and `client.js` is the Settings page console.
 
 Runtime files live under `$DSH_HOME`: `prompt-inject.md`, `rules/`, `skills/`, `net-scope-allow.txt`, `redteam/`. If `DSH_HOME` is unset, the launcher-adjacent `.dsh` wins over `~/.dsh`. Web and the desktop app each use their own home. Skills are not part of the inject section and do not replace the prompt.
 
@@ -350,11 +358,11 @@ Runtime files live under `$DSH_HOME`: `prompt-inject.md`, `rules/`, `skills/`, `
 ## Usage
 
 ```sh
-dsh-purge --status
-dsh-purge --apply
-dsh-purge --revert
-dsh-purge --uninstall
-dsh-purge --edit
+dsh-purge-czx --status
+dsh-purge-czx --apply
+dsh-purge-czx --revert
+dsh-purge-czx --uninstall
+dsh-purge-czx --edit
 
 /purge status | apply | revert | uninstall | edit | help
 /rules list | use <id> | create <id> | delete <id> | reset | help
@@ -372,7 +380,7 @@ If the **same task works in standard but fails in minimal or PTC**, preset `run_
 
 ### Response speed
 
-DSH runs Bash calls in a tool batch one at a time. Older dsh-purge releases raised the default foreground wait from 60 seconds to 10 minutes, so one slow command could hold up later calls for that long. Patch #21 now restores marked plugin values to the official 60-second default. Unmarked timeouts and other custom values are preserved; an unmarked 10-minute value cannot reliably be distinguished from a user setting.
+DSH runs Bash calls in a tool batch one at a time. Older dsh-purge-czx releases raised the default foreground wait from 60 seconds to 10 minutes, so one slow command could hold up later calls for that long. Patch #21 now restores marked plugin values to the official 60-second default. Unmarked timeouts and other custom values are preserved; an unmarked 10-minute value cannot reliably be distinguished from a user setting.
 
 For a shorter wait in `dsh web` on macOS/Linux, add this entry to `$DSH_HOME/profiles/web/cordis.patch.yml` (normally `~/.dsh/profiles/web/cordis.patch.yml`). Edit an existing entry with the same id instead of adding a duplicate. This profile layer is applied after the bundled configuration, so future plugin applies keep the override.
 
@@ -400,9 +408,9 @@ Restart `dsh web` to load the profile. The model and reasoning defaults apply to
 
 Addresses in mainland China, Hong Kong, and Macau stay forbidden unless that one host was registered first. Saying “this is my server” in chat does not allow it. A key or a password does not allow it either.
 
-The box sits under Prompt. If the dock does not show it yet, quit DeepSeek Harness completely and open it again.
+The box sits under Prompt. If the settings page does not show it yet, quit DeepSeek Harness completely and open it again.
 
-1. Click **dsh-purge** beside the session title and stay on **Clean**.
+1. Open **Settings → dsh-purge-czx** and stay on **Clean**.
 2. Scroll past **Prompt**. **Own servers** is the next block.
 3. Put one host on each line, in one of these forms:
    - `203.0.113.10` — one IP.
@@ -452,7 +460,7 @@ flowchart TD
   A["Restart or new session"] --> B["Inject the plugin's encrypted default. No save click, and no host prompt file"]
 ```
 
-Prompt injection and ruleset decision at every turn. The three inputs on the left are what you control in the dsh-purge panel; the dotted edges show which decision each one drives:
+Prompt injection and ruleset decision at every turn. The three inputs on the left are what you control in the dsh-purge-czx panel; the dotted edges show which decision each one drives:
 
 ```mermaid
 flowchart TD
@@ -492,7 +500,7 @@ flowchart TD
   B --> C{"effectivePolicy === 'never'?"}
   C -->|"yes, stock host"| X["rejected before the waterfall even runs"]
   C -->|"plugin downgrades to ask"| D["approval/request waterfall"]
-  D --> E["dsh-purge handler (prepend, outermost)"]
+  D --> E["dsh-purge-czx handler (prepend, outermost)"]
   E --> F["returns allowed-once: granted, no prompt"]
   D --> G["browser approval UI / ACP answerer (shadowed, never runs)"]
 ```
@@ -509,8 +517,8 @@ flowchart TD
   provider and overwrites the text back to the original. The plugin rewrites the `refreshContext` return
   value as well, so both entry points are covered and the model actually reads the hardened sentence.
 - **Toggle**: plugin config `approvalBypass` (default `true`), or
-  `$DSH_HOME/dsh-purge/approval-bypass.json` (`{"approvalBypass": false}`); hot-switchable from the panel
-  and `POST /dsh-purge/approval-bypass`. Turning it off restores the host's own `never` semantics:
+  `$DSH_HOME/dsh-purge-czx/approval-bypass.json` (`{"approvalBypass": false}`); hot-switchable from the panel
+  and `POST /dsh-purge-czx/approval-bypass`. Turning it off restores the host's own `never` semantics:
   no prompt, denied outright.
 
 Skills stay out of the inject section:
@@ -558,14 +566,14 @@ If nothing is found, set `DSH_BASE` / `DSH_DESKTOP_INSTALL`. No files are change
 
 ## Releases
 
-What changed, and the zip, are on [Releases](https://github.com/czx455501074-afk/dsh-purge/releases). To publish, bump the version in `package.json`, write Chinese and English notes in `release-notes.md`, and push `master`. Pushing the same version again does not publish another package.
+What changed, and the zip, are on [Releases](https://github.com/czx455501074-afk/dsh-purge-czx/releases). To publish, bump the version in `package.json`, write Chinese and English notes in `release-notes.md`, and push `master`. Pushing the same version again does not publish another package.
 
 ## Notes
 
 - Scope is rendered copy, defaults, and runtime logic inside local `@deepseek-ai/*` packages, plus override files and rule sets under the harness home.
 - After an upgrade, unmatched originals show as skipped. Apply still completes, and those files are left unchanged.
 - Third-party plugin *source repos* outside `@deepseek-ai` are left alone (CMD silence may **best-effort** patch installed doctor / market / liangshen / mnemon at runtime).
-- Install from this repository only: `dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge` or `dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge`. From this repo, `add .`. If the Git URL fails, use the master.tar.gz archive instead.
+- Install from this repository only: `dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx` or `dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge-czx`. From this repo, `add .`. If the Git URL fails, use the master.tar.gz archive instead.
 
 ---
 

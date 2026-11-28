@@ -1,10 +1,10 @@
 {
-  "name": "local-dsh-purge",
+  "name": "local-dsh-purge-czx",
   "version": "1.2.2",
   "private": true,
   "type": "module",
   "main": "lib/index.js",
-  "description": "dsh-purge 的 dsh-go 手机原生面板：在 App 里看清洗进度、应用、还原",
+  "description": "dsh-purge-czx 的 dsh-go 手机原生面板：在 App 里看清洗进度、应用、还原",
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"

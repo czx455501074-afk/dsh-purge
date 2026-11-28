@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * dsh-purge 补丁漂移诊断
+ * dsh-purge-czx 补丁漂移诊断
  *
  * 逐个补丁、逐个文件、逐条 replacement 检查在当前宿主 @deepseek-ai 上
  * 是「已应用（marker 命中）」「可应用（pattern 命中）」「漂移（pattern 找不到）」
@@ -211,7 +211,7 @@ const summary = rows.reduce((acc, r) => {
 if (asJson) {
   console.log(JSON.stringify({ base: aiBase, realBase, summary, rows }, null, 2));
 } else {
-  console.log("dsh-purge 补丁诊断 / patch diagnosis");
+  console.log("dsh-purge-czx 补丁诊断 / patch diagnosis");
   console.log("  插件根 / base  " + aiBase);
   if (realBase !== aiBase) console.log("  realpath       " + realBase);
   console.log("  汇总 / summary " + Object.entries(summary).map(([k, v]) => k + "=" + v).join(" "));

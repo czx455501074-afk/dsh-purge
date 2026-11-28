@@ -10,7 +10,7 @@
 - **运行时 context 破甲**：不只改 section，还改写装配里的 `approval:policy` 与 `sandbox:policy` 两段运行时 context —— 前者从"审批已禁用、自动拒绝"改成"审批自动放行、可自由请求升级"，后者统一陈述为 `danger-full-access`。
 - **refreshContext 出口守卫**：只改 `assemble` 的返回值是不够的 —— `agent-loop` 在发请求前还会调 `systemPrompt.refreshContext(assembly, ...)`，它按已注册 provider 重新 `resolveContext`，把改好的文本又覆盖回原文（实测：`assemble` 后 `ctxApproval=true`，模型读到的却仍是宿主原句）。因此额外在 `SystemPrompt.prototype.refreshContext` 的返回处再改写一次，两个入口都覆盖才真正落到模型。只改返回值、不自己注册 —— 主动注册 `approval:policy` 会与 ApprovalService 自身的注册重名（`NamedEntries.insert` 直接抛错），把审批服务整个打掉、permission-presets 卡在 pending。
 - **诊断脚本 `--suggest`**：补丁漂移时直接打印宿主当前对应代码块，可整段粘贴回 `lib/core.js` 当新锚点。
-- 开关：`approvalBypass`（默认开）走 `$DSH_HOME/dsh-purge/approval-bypass.json`，面板与 HTTP 路由 `/dsh-purge/approval-bypass` 均可热切换，关掉后 `never` 恢复宿主原语义。
+- 开关：`approvalBypass`（默认开）走 `$DSH_HOME/dsh-purge-czx/approval-bypass.json`，面板与 HTTP 路由 `/dsh-purge-czx/approval-bypass` 均可热切换，关掉后 `never` 恢复宿主原语义。
 
 ## English
 
@@ -22,20 +22,20 @@
 - **Runtime context hardening**: beyond sections, the assembled runtime contexts `approval:policy` and `sandbox:policy` are rewritten — the former now states approvals are auto-granted and escalation may be requested freely, the latter reports `danger-full-access`.
 - **refreshContext exit guard**: rewriting the `assemble` return value alone is not enough — before a request is sent, `agent-loop` calls `systemPrompt.refreshContext(assembly, ...)`, which re-`resolveContext`s every registered provider and overwrites the text back to the original (measured: `ctxApproval=true` after assemble, yet the model still read the host sentence). The guard therefore rewrites `SystemPrompt.prototype.refreshContext`'s return value as well, so both entry points are covered. Only return values are touched; the plugin never registers an `approval:policy` of its own, because a duplicate name makes `NamedEntries.insert` throw and knocks ApprovalService out entirely, leaving permission-presets stuck on pending.
 - **`--suggest` in the diagnose script**: when a patch drifts it prints the host's current code block, ready to paste back into `lib/core.js` as the new anchor.
-- Toggle: `approvalBypass` (on by default) is stored in `$DSH_HOME/dsh-purge/approval-bypass.json`, hot-switchable from the panel or `POST /dsh-purge/approval-bypass`; turning it off restores the host's own `never` semantics.
+- Toggle: `approvalBypass` (on by default) is stored in `$DSH_HOME/dsh-purge-czx/approval-bypass.json`, hot-switchable from the panel or `POST /dsh-purge-czx/approval-bypass`; turning it off restores the host's own `never` semantics.
 
 # 1.2.2
 
 ## 中文
 
-- 新增 **dsh-go 启动钩子**：App 每次启动引擎都会还原 `/opt/dsh`，`--apply` 的补丁活不过一次重启。`dsh-purge --boot-hook-install` 在 `/usr/local/bin/dsh` 的 node 后面加 `--import=$DSH_HOME/dsh-purge-boot.mjs`（排在官方 boot-cache 之前），每次启动先用 2 秒重打补丁，同一轮启动即加载补丁后的宿主；日志写 `$DSH_HOME/dsh-purge/boot-hook.log`。
+- 新增 **dsh-go 启动钩子**：App 每次启动引擎都会还原 `/opt/dsh`，`--apply` 的补丁活不过一次重启。`dsh-purge-czx --boot-hook-install` 在 `/usr/local/bin/dsh` 的 node 后面加 `--import=$DSH_HOME/dsh-purge-czx-boot.mjs`（排在官方 boot-cache 之前），每次启动先用 2 秒重打补丁，同一轮启动即加载补丁后的宿主；日志写 `$DSH_HOME/dsh-purge-czx/boot-hook.log`。
 - 原生面板里加了「启动钩子」按钮，手机上不用敲命令；面板还会显示钩子是否已装。
 - 钩子失败只记日志、绝不拦启动；并发启动用 lock 去重；`--boot-hook-remove` 从 `.dshpurge.bak` 逐字节还原启动器，`--boot-hook-status` 查看状态，`DSH_PURGE_BOOT_HOOK=0` 临时跳过。
 - `dsh-go/README.md` 补了「补丁为什么每次重启消失」和钩子用法。
 
 ## English
 
-- New **dsh-go boot hook**: the app restores `/opt/dsh` on every engine start, so `--apply` edits die on the next launch. `dsh-purge --boot-hook-install` adds `--import=$DSH_HOME/dsh-purge-boot.mjs` before the official boot cache in `/usr/local/bin/dsh`; each start re-applies the patches in ~2s, so the same boot loads the patched host. Log: `$DSH_HOME/dsh-purge/boot-hook.log`.
+- New **dsh-go boot hook**: the app restores `/opt/dsh` on every engine start, so `--apply` edits die on the next launch. `dsh-purge-czx --boot-hook-install` adds `--import=$DSH_HOME/dsh-purge-czx-boot.mjs` before the official boot cache in `/usr/local/bin/dsh`; each start re-applies the patches in ~2s, so the same boot loads the patched host. Log: `$DSH_HOME/dsh-purge-czx/boot-hook.log`.
 - The native panel gained a "boot hook" button, so the phone needs no CLI command; it also shows whether the hook is installed.
 - The hook only logs failures and never blocks startup; a lock dedupes concurrent starts; `--boot-hook-remove` restores the launcher byte-for-byte from `.dshpurge.bak`; `--boot-hook-status` inspects it; `DSH_PURGE_BOOT_HOOK=0` skips one run.
 - `dsh-go/README.md` now explains why patches vanish on restart and how to use the hook.
@@ -52,7 +52,7 @@
 
 - Fixes **"messages cannot be sent"** after enabling 1.2.0 on DSH 0.2.2: the plugin replaced the official persona-suffix with `Your working directory is {{cwd}}.`; 0.2.2 registers only `provider`/`model` (`cwd` became a runtime context), so `renderPrompt` threw `unknown prompt variable "{{cwd}}"` and every turn ended at step 1 with `turn/end error`.
 - The suffix now carries the literal cwd with `interpolate:false` (fallback `the session workspace`); leftover `{{cwd}}` is literalized and stray `{{x}}` in plugin/persona sections is escaped as `{ {x}}`.
-- Verified with headless + dsh-purge: same error before, the request reaches the model after (only the dummy key 401 remains).
+- Verified with headless + dsh-purge-czx: same error before, the request reaches the model after (only the dummy key 401 remains).
 
 # 1.2.0
 
@@ -97,7 +97,7 @@
 ## 中文
 
 - 版本 **1.1.70**。
-- Hub / 残装若给 `dsh-purge` 加上 `pluginPackages`，Cordis 会一直 pending，宿主退出码 1。本版把依赖钉回 `systemPrompt` + `tools`。
+- Hub / 残装若给 `dsh-purge-czx` 加上 `pluginPackages`，Cordis 会一直 pending，宿主退出码 1。本版把依赖钉回 `systemPrompt` + `tools`。
 - 清洗页只合并升级链展示（免责、审批、挂全文、hooks 等），Apply 仍打全部补丁。
 - 去掉已无用的 #81 / #89 清单行；挂全文并进 #87，官方 phase-1 走静默放行。
 - 指挥端改为「按用户给的目标开工」。合并 #97 / #98 / #99。
@@ -105,7 +105,7 @@
 ## English
 
 - **1.1.70**.
-- Hub / incomplete installs that inject `pluginPackages` leave dsh-purge pending and kill the host. Dependencies are pinned to `systemPrompt` + `tools`.
+- Hub / incomplete installs that inject `pluginPackages` leave dsh-purge-czx pending and kill the host. Dependencies are pinned to `systemPrompt` + `tools`.
 - Clean page groups upgrade-chain patches for display only; Apply still writes every patch.
 - Dropped dead #81 / #89 rows. Hang lives in #87. Official phase-1 keep is silent.
 - Commander bind: start from the user's target. Includes #97 / #98 / #99.
@@ -162,7 +162,7 @@
 - 启动种子：进程启动时若 `$DSH_HOME/prompt-inject.md` 为空或缺失，自动把加密默认稿写一次；用户改过的稿不动。清洗完点重启后，重启成功立刻就能用默认提示词。
 - Windows 官方包重启：restart 脚本名改成 `pid+random`，首启不与并发实例打架；多余的 `.cmd` 中介删掉，直接 `wscript.exe //nologo //B` 起脚本；本机旧版无 pid 后缀的脚本/日志超过 24h 启动时自动清。
 - 杀进程范围收紧：`ASAR_SWAP_PS1` 不再 `/IM` 杀全名同名进程，只按安装根下 pid 停，避免误伤第三方同名。
-- 官方 CLI shim 原地改写之前先存一份 `.dsh-purge.bak`，并走原子写，断电/盘满可回退。
+- 官方 CLI shim 原地改写之前先存一份 `.dsh-purge-czx.bak`，并走原子写，断电/盘满可回退。
 - 首装场景不卡：WScript 判 clean 时，两边都是 null（文件缺或读失败）放行启动，只有任一明确 dirty 才拦。
 - 探测缓存：`runningExes` / `shortcutExes` 空结果不再缓存；点"应用"前 `clearDesktopLocateCache()` 仍可强刷。
 - `scheduleAsarRenameWhenIdle` 的 `.rename-pending` 锁：时钟回拨或超过 30 分钟视为失效，清掉重做。
@@ -177,7 +177,7 @@
 - Boot-time seeding: on startup, if `$DSH_HOME/prompt-inject.md` is empty or missing, the encrypted default is written once; a user-edited file is untouched. After the Apply → cleanup → restart cycle, the default prompt is active immediately.
 - Windows official-build restart: restart script name now includes `pid+random`, so concurrent instances don't clobber each other; the `.cmd` intermediary is dropped — `wscript.exe //nologo //B` is spawned directly; legacy unsuffixed scripts/logs older than 24h are purged on each startup.
 - Kill scope tightened: `ASAR_SWAP_PS1` no longer uses `/IM` to kill by full name — only pids under the install root are stopped, so same-named third-party processes aren't collateral.
-- Official CLI shim repair now saves `.dsh-purge.bak` and uses atomic write before overwriting, so power loss / disk full is recoverable.
+- Official CLI shim repair now saves `.dsh-purge-czx.bak` and uses atomic write before overwriting, so power loss / disk full is recoverable.
 - First-install not blocked: when WScript checks for clean markers, two nulls (missing or unreadable) now pass through; only an explicit `false` blocks startup.
 - Probe caches: `runningExes` / `shortcutExes` no longer cache empty results; `clearDesktopLocateCache()` on Apply still forces a refresh.
 - `scheduleAsarRenameWhenIdle` `.rename-pending` lock: clock skew or ≥30-min-old lock is treated as stale and cleared.
@@ -190,7 +190,7 @@
 
 - 版本 **1.1.66**。
 - **#80**：清洗页可关掉 hooks deny / ask 旁路。关掉且文件干净显示跳过，不计入已应用；关掉后再打开，64/65 会按官方形态再打一次。
-- **#81**：继续 / 拒答续跑的来源 kind 改为 `dsh-purge`；限流和传输失败不再自动续一轮。
+- **#81**：继续 / 拒答续跑的来源 kind 改为 `dsh-purge-czx`；限流和传输失败不再自动续一轮。
 - 重启后不用点保存也会挂上默认提示词；每一轮都补回全文。空的应用请求不再清空磁盘上的提示词。
 - 声明过的 overlay 只剩 `.dshpurge.bak` 时，应用会先拷回再加载。
 - 红队报告补上得分点短名。中文 README 恢复题图和预览图。
@@ -199,7 +199,7 @@
 
 - **1.1.66**.
 - **#80**: The clean page can turn off the hooks deny/ask bypass. Off + clean files show skipped and are not counted as applied. Turning it back on reapplies 64/65 from the official form.
-- **#81**: Continue / refusal-recover use source kind `dsh-purge`. RATE_LIMIT and TRANSPORT no longer start another continue turn.
+- **#81**: Continue / refusal-recover use source kind `dsh-purge-czx`. RATE_LIMIT and TRANSPORT no longer start another continue turn.
 - Restart hangs the default prompt without a Save click; every step puts the full text back. An empty Apply body no longer wipes the disk prompt.
 - A declared overlay that exists only as `.dshpurge.bak` is copied back before load.
 - Red-team reports get short score-point names. Chinese README restores the banner and preview images.
@@ -688,12 +688,12 @@
 
 ## 涓枃
 
-- 鐗堟湰鍗囩骇鍒?1.1.35銆?- 鍚姩鏃朵笉鍐嶈嚜鍔ㄦ洿鏂帮紝瑕佽嚜宸卞湪闈㈡澘閲岄€夋嫨銆?- dsh-purge 鍏ュ彛鏀瑰埌銆屼笂涓嬫枃銆嶆梺杈癸紝涓嶅啀鎸′綇鍒殑鎻掍欢鎸夐挳銆?- 寰楀垎鍙ｅ緞瀵归綈涓婃父锛?5 椤癸紝Web 搴旂敤澧炲姞鍏滃簳褰掔被銆?- 鐭ヨ瘑搴?14 绫昏鏁板寘鍚湰鏈?nuclei 妯℃澘锛岀偣鏌愪竴绫诲彲浠ョ瓫閫夈€?- 鎶€鑳借矾寰勮窡闅?`$DSH_HOME`锛屼笉鍐嶅洜涓虹ず渚嬭矾寰勫湪鏈満涓嶅瓨鍦ㄥ氨鎶婃暣鏉℃妧鑳芥爣鎴愪笉鍙敤銆?
+- 鐗堟湰鍗囩骇鍒?1.1.35銆?- 鍚姩鏃朵笉鍐嶈嚜鍔ㄦ洿鏂帮紝瑕佽嚜宸卞湪闈㈡澘閲岄€夋嫨銆?- dsh-purge-czx 鍏ュ彛鏀瑰埌銆屼笂涓嬫枃銆嶆梺杈癸紝涓嶅啀鎸′綇鍒殑鎻掍欢鎸夐挳銆?- 寰楀垎鍙ｅ緞瀵归綈涓婃父锛?5 椤癸紝Web 搴旂敤澧炲姞鍏滃簳褰掔被銆?- 鐭ヨ瘑搴?14 绫昏鏁板寘鍚湰鏈?nuclei 妯℃澘锛岀偣鏌愪竴绫诲彲浠ョ瓫閫夈€?- 鎶€鑳借矾寰勮窡闅?`$DSH_HOME`锛屼笉鍐嶅洜涓虹ず渚嬭矾寰勫湪鏈満涓嶅瓨鍦ㄥ氨鎶婃暣鏉℃妧鑳芥爣鎴愪笉鍙敤銆?
 ## English
 
 - Version 1.1.35.
 - Startup no longer auto-updates; choose the update in the panel.
-- The dsh-purge entry sits beside Context, so it no longer covers other plugin buttons.
+- The dsh-purge-czx entry sits beside Context, so it no longer covers other plugin buttons.
 - Scoring matches upstream: 25 items, with a fallback bucket for other web apps.
 - The 14 knowledge categories count local nuclei templates, and a category filters the list.
 - Skill paths follow `$DSH_HOME`. A skill is no longer marked unavailable just because an example path is missing on this machine.
@@ -723,12 +723,12 @@
 
 ## 涓枃
 
-- 鐗堟湰鍗囩骇鍒?1.1.32銆?- **鎸夋祴璇曠増鎺ヤ笂婕旂粌鍙板竷灞€**锛氶潰鏉垮彲鎷栧姩銆佸彲鏀瑰ぇ灏忥紝娴呰壊鍜屾繁鑹茶窡瀹夸富涓婚璧般€?- **璁剧疆椤典笉鍐嶅嚭鐜版湰鎻掍欢**銆備粠浼氳瘽鏍囬鏃佺殑 dsh-purge 鎵撳紑鍙充晶鏍忥紝娓呮礂鍜屾紨缁冨彴閮藉湪閲岄潰銆?
+- 鐗堟湰鍗囩骇鍒?1.1.32銆?- **鎸夋祴璇曠増鎺ヤ笂婕旂粌鍙板竷灞€**锛氶潰鏉垮彲鎷栧姩銆佸彲鏀瑰ぇ灏忥紝娴呰壊鍜屾繁鑹茶窡瀹夸富涓婚璧般€?- **璁剧疆椤典笉鍐嶅嚭鐜版湰鎻掍欢**銆備粠浼氳瘽鏍囬鏃佺殑 dsh-purge-czx 鎵撳紑鍙充晶鏍忥紝娓呮礂鍜屾紨缁冨彴閮藉湪閲岄潰銆?
 ## English
 
 - Version 1.1.32.
 - **Bring the beta dock layout onto stable**: the panel can be dragged and resized, and light and dark follow the host theme.
-- **The plugin no longer appears on the Settings page.** Open the right dock from dsh-purge beside the session title. Clean and Drill are both in that dock.
+- **The plugin no longer appears on the Settings page.** Open the right dock from dsh-purge-czx beside the session title. Clean and Drill are both in that dock.
 
 # 1.1.31
 
@@ -818,10 +818,10 @@
 
 ## 涓枃
 
-- **淇瀹樻柟妗岄潰鐐广€屽簲鐢ㄣ€嶆姤 ENOENT**銆俙app.asar` 杩樺湪鏃讹紝鏂板缓 `dsh-purge-child-process-hide.mjs` 浼氬け璐ワ紝璺緞琚啓鎴?`resources\app.asar\...\dsh-purge-child-process-hide.mjs`锛岃ˉ涓佸仠鍦ㄥ緟搴旂敤銆?- **鍘熷洜**锛氬畼鏂瑰鎴风杩樺甫鐫€ `app.asar` 鏃讹紝Electron 浼氭妸 `resources\app` 鏄犲皠杩涜繖涓綊妗ｃ€傚綊妗ｉ噷娌℃湁鐨勬柊鏂囦欢锛岀敤鏅€氭枃浠舵帴鍙ｅ幓鍒涘缓灏变細 ENOENT銆?- **涓ょ鍐欐硶閮戒繚鐣?*銆傚綊妗ｈ繕鍦ㄦ椂锛屾敼鍐欑湡瀹炵鐩樹笂鐨?`resources\app`銆傛病鏈?`app.asar` 鏃朵粛鐢ㄥ師鏉ョ殑 `node:fs`锛屽寘鎷?Web銆佺ぞ鍖烘闈紝浠ュ強瀹樻柟鍖呭凡缁忚В寮€骞舵妸褰掓。鎸垚 `app.asar.bak` 鐨勬儏鍐点€?- 瀹夎鐩綍涓嶅啓姝荤洏绗︺€俉eb 鍜岀ぞ鍖烘闈㈢殑搴旂敤銆侀噸鍚繚鎸佸師鏍枫€傚涓讳粛瀵瑰噯 **dsh 0.1.7-rc.2**銆?
+- **淇瀹樻柟妗岄潰鐐广€屽簲鐢ㄣ€嶆姤 ENOENT**銆俙app.asar` 杩樺湪鏃讹紝鏂板缓 `dsh-purge-czx-child-process-hide.mjs` 浼氬け璐ワ紝璺緞琚啓鎴?`resources\app.asar\...\dsh-purge-czx-child-process-hide.mjs`锛岃ˉ涓佸仠鍦ㄥ緟搴旂敤銆?- **鍘熷洜**锛氬畼鏂瑰鎴风杩樺甫鐫€ `app.asar` 鏃讹紝Electron 浼氭妸 `resources\app` 鏄犲皠杩涜繖涓綊妗ｃ€傚綊妗ｉ噷娌℃湁鐨勬柊鏂囦欢锛岀敤鏅€氭枃浠舵帴鍙ｅ幓鍒涘缓灏变細 ENOENT銆?- **涓ょ鍐欐硶閮戒繚鐣?*銆傚綊妗ｈ繕鍦ㄦ椂锛屾敼鍐欑湡瀹炵鐩樹笂鐨?`resources\app`銆傛病鏈?`app.asar` 鏃朵粛鐢ㄥ師鏉ョ殑 `node:fs`锛屽寘鎷?Web銆佺ぞ鍖烘闈紝浠ュ強瀹樻柟鍖呭凡缁忚В寮€骞舵妸褰掓。鎸垚 `app.asar.bak` 鐨勬儏鍐点€?- 瀹夎鐩綍涓嶅啓姝荤洏绗︺€俉eb 鍜岀ぞ鍖烘闈㈢殑搴旂敤銆侀噸鍚繚鎸佸師鏍枫€傚涓讳粛瀵瑰噯 **dsh 0.1.7-rc.2**銆?
 ## English
 
-- **Fixes ENOENT when Apply runs on the official desktop.** While `app.asar` is still present, creating `dsh-purge-child-process-hide.mjs` failed. The path was rewritten to `resources\app.asar\...\dsh-purge-child-process-hide.mjs`, and patches stayed pending.
+- **Fixes ENOENT when Apply runs on the official desktop.** While `app.asar` is still present, creating `dsh-purge-czx-child-process-hide.mjs` failed. The path was rewritten to `resources\app.asar\...\dsh-purge-czx-child-process-hide.mjs`, and patches stayed pending.
 - **Cause**: with the archive still in place, Electron maps `resources\app` into `app.asar`. Creating a file that is not already in the archive through the normal file API throws ENOENT.
 - **Both write paths stay.** If the archive is still there, files are written on the real `resources\app` directory. If there is no `app.asar`, the previous `node:fs` path is unchanged. That covers Web, community desktop, and an official install that has already been unpacked and had the archive moved to `app.asar.bak`.
 - Install paths are not pinned to a drive letter. Web and community desktop keep their existing Apply and restart. The host target remains **dsh 0.1.7-rc.2**.
@@ -880,12 +880,12 @@
 
 ## 涓枃
 
-- **绋冲畾鎬?*锛氫慨澶嶈缃ˉ涓?#42 鍦?dsh 0.1.7 涓婇噸澶嶆彃鍏?`legacyApplyPath` 鐨勯棶棰樸€傛鍓嶄細瀵艰嚧 `@deepseek-ai/dsh-settings` 鏃犳硶鍔犺浇銆佹彁渚涘晢鐩綍鎶ラ敊銆乵nemon 绛夋彃浠惰繛閿?pending銆傜幇鏀逛负 `skipIfMarked`锛屼笖涓嶅啀涓庡畼鏂瑰凡鑷甫鐨?`legacyApplyPath` 鍙犲啓銆?- **宸ヤ綔鍖哄己鎸囦护**锛?1/#2 鍚屾椂璇嗗埆 `WORKSPACE_*` 涓?`AGENT_*` 甯搁噺鍚嶏紝閬垮厤銆屽叏灞€/鏇挎崲寮忓厤璐ｃ€嶅湪鏃у涓讳笂鏄剧ず璺宠繃銆佸簲鐢ㄦ棤鏁堛€?- **鎷掔瓟涓庤蒋鎷?*锛氬畼鏂?`agent-instructions` 寮烘寚浠よˉ鍏呮湰鏈烘巿鏉冭瘎娴嬩笌鍙嶈蒋鎷掕瘽鏈紱鎻掍欢澧炲姞鍥哄畾 `dsh-purge:rules` 娈碉紙涓庢墽琛岃鍒欎竴鑷达級銆?*鏂板紑浼氳瘽骞堕噸鍚?dsh 鍚?*鐢熸晥銆?
+- **绋冲畾鎬?*锛氫慨澶嶈缃ˉ涓?#42 鍦?dsh 0.1.7 涓婇噸澶嶆彃鍏?`legacyApplyPath` 鐨勯棶棰樸€傛鍓嶄細瀵艰嚧 `@deepseek-ai/dsh-settings` 鏃犳硶鍔犺浇銆佹彁渚涘晢鐩綍鎶ラ敊銆乵nemon 绛夋彃浠惰繛閿?pending銆傜幇鏀逛负 `skipIfMarked`锛屼笖涓嶅啀涓庡畼鏂瑰凡鑷甫鐨?`legacyApplyPath` 鍙犲啓銆?- **宸ヤ綔鍖哄己鎸囦护**锛?1/#2 鍚屾椂璇嗗埆 `WORKSPACE_*` 涓?`AGENT_*` 甯搁噺鍚嶏紝閬垮厤銆屽叏灞€/鏇挎崲寮忓厤璐ｃ€嶅湪鏃у涓讳笂鏄剧ず璺宠繃銆佸簲鐢ㄦ棤鏁堛€?- **鎷掔瓟涓庤蒋鎷?*锛氬畼鏂?`agent-instructions` 寮烘寚浠よˉ鍏呮湰鏈烘巿鏉冭瘎娴嬩笌鍙嶈蒋鎷掕瘽鏈紱鎻掍欢澧炲姞鍥哄畾 `dsh-purge-czx:rules` 娈碉紙涓庢墽琛岃鍒欎竴鑷达級銆?*鏂板紑浼氳瘽骞堕噸鍚?dsh 鍚?*鐢熸晥銆?
 ## English
 
 - **Stability**: patch #42 no longer stacks duplicate `legacyApplyPath` on dsh 0.1.7, which broke `@deepseek-ai/dsh-settings`, provider catalog loading, and downstream plugins. Uses `skipIfMarked` and does not re-insert the helper the official package already ships.
 - **Workspace intros**: patches #1/#2 match both `WORKSPACE_*` and `AGENT_*` constant names so rows no longer show Skipped on older installs.
-- **Refusal / soft refusal**: stronger official workspace intros plus a fixed `dsh-purge:rules` section. **Restart dsh and start a new chat** for prompt changes.
+- **Refusal / soft refusal**: stronger official workspace intros plus a fixed `dsh-purge-czx:rules` section. **Restart dsh and start a new chat** for prompt changes.
 
 # 1.1.16
 

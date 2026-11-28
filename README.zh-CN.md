@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/banner.svg" alt="dsh-purge" width="720">
+  <img src="docs/banner.svg" alt="dsh-purge-czx" width="720">
 </p>
 
-<h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
+<h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge-czx）</h1>
 
 <p align="center"><strong>Version 1.2.3</strong></p>
 
@@ -11,8 +11,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/czx455501074-afk/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/czx455501074-afk/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
-  <a href="https://github.com/czx455501074-afk/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
+  <a href="https://github.com/czx455501074-afk/dsh-purge-czx/stargazers"><img src="https://img.shields.io/github/stars/czx455501074-afk/dsh-purge-czx?logo=github&label=Stars" alt="GitHub stars"></a>
+  <a href="https://github.com/czx455501074-afk/dsh-purge-czx/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.1-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
@@ -23,13 +23,21 @@
   <a href="README.md">English</a> | <a href="README.zh-CN.md">中文</a>
 </p>
 
-> **本仓库由 czx 维护，安装与更新只走本仓库。** 上游原项目（原作者 **YuJunZhiXue**，见 [署名要求](#署名要求)）已暂停发版：不再发版、暂不收 issue / PR。本仓库保留其代码与原作者署名，分发地址改为 [czx455501074-afk/dsh-purge](https://github.com/czx455501074-afk/dsh-purge)。
+> **本仓库由 czx 维护，安装与更新只走本仓库。** 上游原项目（原作者 **YuJunZhiXue**，见 [署名要求](#署名要求)）已暂停发版：不再发版、暂不收 issue / PR。本仓库保留其代码与原作者署名，分发地址改为 [czx455501074-afk/dsh-purge-czx](https://github.com/czx455501074-afk/dsh-purge-czx)。
 
 > **官方 Web、官方桌面端和 dsh-go 手机版都支持。** 官方 `dsh web` 用 profile `web`；官方桌面 EXE（DeepSeek Harness **0.2.2-rc.1**）用 profile `desktop`；**dsh-go 手机 App** 也用 profile `web`，另外装一份 [原生面板](dsh-go/README.md) 才能在手机上点应用。Web / 桌面分开安装、分开点「应用」。当前版本适配 dsh 0.2.2；更早的 dsh 用对应的老版本插件。社区桌面端不维护。
 >
-> 写进 profile 还不会改宿主。点会话标题旁的 **dsh-purge** → **清洗** → **应用**。成功会自动重启；补丁没打完不重启。重启后新开一轮对话，注入才进当前会话。
+> 写进 profile 还不会改宿主。打开 **DSH 设置 → dsh-purge-czx** → **清洗** → **应用**。成功会自动重启；补丁没打完不重启。重启后新开一轮对话，注入才进当前会话。
 >
-> Node.js **≥18**。Windows 无闪窗需要 **Node ≥22**。下面的安装命令统一走本仓库 `https://github.com/czx455501074-afk/dsh-purge`，不装 npm 上的旧包。
+> Node.js **≥18**。Windows 无闪窗需要 **Node ≥22**。下面的安装命令统一走本仓库 `https://github.com/czx455501074-afk/dsh-purge-czx`，不装 npm 上的旧包。
+
+## 2.0 更新
+
+- **唯一入口。** 右下角悬浮按钮、首页芯片、标签栏芯片、输入框按钮全部删除，所有管理操作收进 **DSH 设置 → dsh-purge-czx**。
+- **改名** `dsh-purge-czx`：安装地址、bundle 补丁 id、状态目录、locale 命名空间和日志前缀同步。
+- **兼容。** 用 `engines.dsh`（`>=0.2.2-rc.1 <0.3.0`）替代旧的 `dshTarget` 字段；首次启动把状态目录从 `$DSH_HOME/dsh-purge` 迁过来。
+- **性能。** 去掉侧栏 1.5 秒轮询和首页 / 标签栏 1 秒 DOM 轮询；主题改由 `prefers-color-scheme` 加一个 MutationObserver 驱动。
+- **诊断。** 新增 `purge_doctor` 工具：版本、补丁锚点健康度、旧注册项、bundle 体积。
 
 ## 目录
 
@@ -48,21 +56,21 @@
 
 ## 介绍
 
-**dsh-purge** 是装在本机官方 [DeepSeek Harness](https://www.deepseek.com/harness/) 上的网络安全红队评测插件。官方 **Web**（`dsh web`）和官方 **桌面端**（EXE）都支持，两边分开装、分开应用。
+**dsh-purge-czx** 是装在本机官方 [DeepSeek Harness](https://www.deepseek.com/harness/) 上的网络安全红队评测插件。官方 **Web**（`dsh web`）和官方 **桌面端**（EXE）都支持，两边分开装、分开应用。
 
 Harness 不只是把问题交给模型。它还会在运行时改提示词、审批门、沙箱和会话格式。只看「模型答不答」，会把宿主拦截误当成模型拒绝。这个插件在你自己的安装里把这两层分开，用来做受控评测，也用来看默认策略该不该收紧。
 
 
 | 你会用到             | 它做什么                                            |
 | ---------------- | ----------------------------------------------- |
-| **dsh-purge 侧栏** | 会话标题旁的按钮打开右侧栏。里面两页：清洗、演练台                       |
+| **dsh-purge-czx 设置页** | 唯一入口：**DSH 设置 → dsh-purge-czx**。里面两页：清洗、演练台。会话里不再有任何悬浮按钮 |
 | **清洗**           | 分组查看补丁，应用、还原、卸载；编辑提示词和多套规则                      |
 | **演练台**          | 正式版内置。授权后查看资产、技能和本机环境。只用于你有权管理的本机、离线靶标或已书面授权的演练 |
 | **宿主策略**         | 调整默认文案、权限策略和工具上限。官方能力保留，不另写一套身份                 |
 | **启动时**          | 自动再检查并应用。npm 升级盖掉 `node_modules` 之后不用手改文件       |
 
 
-不写死盘符。按 `$DSH_HOME`、dsh 启动器旁边的 `.dsh`，再退回 `~/.dsh`。不改 Harness 源码仓库，在 **dsh-purge** 的「清洗」里点「应用」才写入。身份来自插件里的加密提示词，也就是提示词框默认显示的那一份。不读取宿主磁盘上的提示词文件。
+不写死盘符。按 `$DSH_HOME`、dsh 启动器旁边的 `.dsh`，再退回 `~/.dsh`。不改 Harness 源码仓库，在 **dsh-purge-czx** 的「清洗」里点「应用」才写入。身份来自插件里的加密提示词，也就是提示词框默认显示的那一份。不读取宿主磁盘上的提示词文件。
 
 本插件只处理使用者本机已安装的官方 `@deepseek-ai` 包和本机配置。它不是公网扫描器，也不是针对第三方站点的攻击套件。仓库内不含木马、未授权渗透脚本或对外攻击载荷。
 
@@ -74,7 +82,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 **原作者：YuJunZhiXue**（原仓库 <https://github.com/YuJunZhiXue/dsh-purge>）。代码、提示词与名称的一切权利归原作者，`LICENSE`（MIT）原样保留。
 
-**借用本项目的名称、思路、代码或提示词，必须署名原作者，并写明来源仓库：** [czx455501074-afk/dsh-purge](https://github.com/czx455501074-afk/dsh-purge)（原作者 YuJunZhiXue）。
+**借用本项目的名称、思路、代码或提示词，必须署名原作者，并写明来源仓库：** [czx455501074-afk/dsh-purge-czx](https://github.com/czx455501074-afk/dsh-purge-czx)（原作者 YuJunZhiXue）。
 
 不署名、隐瞒来源、改头换面据为己有，原作者将依法追究责任。
 
@@ -88,7 +96,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 **【零容忍严正申明】**：本项目坚决反对并严禁任何形式的违法犯罪行为！本项目开发者绝不支持、不鼓励、不协助任何未授权网络攻击、漏洞利用、数据窃取、非法侵入计算机信息系统或生成违法违禁内容的活动。**任何将本项目用于违法犯罪的行为，均与开发者无关，由行为人依法独立承担全部法律责任。**
 
-1. **本仓库不含违法内容**：`dsh-purge` 发布的代码、文档、补丁与默认提示词**不是**木马、后门、未授权渗透工具、勒索软件、撞库脚本，也**不是**针对公网或第三方系统的攻击载荷。项目本身不提供违法内容，也不教唆、组织、协助实施违法犯罪。
+1. **本仓库不含违法内容**：`dsh-purge-czx` 发布的代码、文档、补丁与默认提示词**不是**木马、后门、未授权渗透工具、勒索软件、撞库脚本，也**不是**针对公网或第三方系统的攻击载荷。项目本身不提供违法内容，也不教唆、组织、协助实施违法犯罪。
 2. **只作用于本机官方 Harness**：安全评测补丁、提示词注入全部发生在使用者**本机已安装的官方 DeepSeek Harness**（`@deepseek-ai` 包、本机 profile / `$DSH_HOME`）上。对象是使用者自己的官方本地软件，**不是**他人的网站、服务器、账号或信息系统。
 3. **评测补丁不对外网目标联网**：应用补丁、写入注入、回滚、卸载均在本机文件与本机进程内完成，**不对任何公网主机、未授权系统进行扫描、探测、入侵或攻击发包**。不得把本项目当作跳板去打外网。插件若开启「检测更新」，仅可能访问本插件自己的 GitHub 仓库以核对版本，**与对第三方系统的网络攻击无关**，也不能被解释为授权对外渗透。
 4. **合法受控范围限定**：本项目定位为使用者在**自己有权管理的本机官方 Harness**上，进行红队科研与鲁棒性评测的辅助工具。**严禁在未经所有者合法书面授权的目标、公网在线系统或生产业务上运行本项目**。一切测试必须限制在**本机已授权安装的官方 Harness、离线本地合成靶标、授权网络安全演练靶场及合规实验室受控环境**中进行。
@@ -120,7 +128,7 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 
 - **dsh 0.2.2-rc.1**（官方桌面 / 官方 `dsh web` / **dsh-go 手机 App**）：用 **1.2.3** 及以上。本页命令装的就是这一档。
 - **dsh 0.2.0-rc.2**：用 **1.1.40 – 1.1.71**。
-- **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/czx455501074-afk/dsh-purge/releases) 里选对应标签。
+- **dsh 0.1.7**（含 rc.1 / rc.2）：用 **1.1.39** 及更早 —— 在 [Releases](https://github.com/czx455501074-afk/dsh-purge-czx/releases) 里选对应标签。
 
 对不上的补丁会显示待应用或跳过，不会乱改文件。换 dsh 版本后先跑 `npm run diagnose`（`node scripts/diagnose-patches.mjs`）看哪些锚点漂移了。
 
@@ -133,23 +141,23 @@ Harness 不只是把问题交给模型。它还会在运行时改提示词、审
 **Web（官方 `dsh web`）**
 
 ```sh
-dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
 **桌面端（官方 EXE）**
 
 ```sh
-dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
-当前目录已经是本仓库时，把地址换成 `add .`。`dsh` 不在 PATH 时走 [手动安装](#manual)。git 地址装不上：同一个 `--profile`，把目标换成压缩包 `https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz`。
+当前目录已经是本仓库时，把地址换成 `add .`。`dsh` 不在 PATH 时走 [手动安装](#manual)。git 地址装不上：同一个 `--profile`，把目标换成压缩包 `https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz`。
 
-也可以直接下压缩包装：`https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz`，解压后把 `dsh-purge-master` 改名为 `dsh-purge`，再 `dsh plugin --profile web add <解压后的路径>`（桌面端换成 `--profile desktop`）。
+也可以直接下压缩包装：`https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz`，解压后把 `dsh-purge-czx-master` 改名为 `dsh-purge-czx`，再 `dsh plugin --profile web add <解压后的路径>`（桌面端换成 `--profile desktop`）。
 
 桌面客户端也可以点按钮（`dsh://` 唤起）：
 
 <p align="center">
-  <a href="dsh://plugin/install?id=dsh-purge&name=dsh-purge&version=1.2.3&repo=czx455501074-afk%2Fdsh-purge&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fczx455501074-afk%2Fdsh-purge%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
+  <a href="dsh://plugin/install?id=dsh-purge-czx&name=dsh-purge-czx&version=1.2.3&repo=czx455501074-afk%2Fdsh-purge-czx&permissions=%E7%B3%BB%E7%BB%9F%E6%8F%90%E7%A4%BA%E8%AF%8D%E6%B3%A8%E5%85%A5%2C%E6%9C%AC%E6%9C%BA%E8%A1%A5%E4%B8%81%2C%E8%AE%BE%E7%BD%AE%E9%A1%B5&downloadUrl=https%3A%2F%2Fgithub.com%2Fczx455501074-afk%2Fdsh-purge-czx%2Farchive%2Frefs%2Fheads%2Fmaster.tar.gz"><strong>唤起客户端一键安装</strong></a>
 </p>
 
 ### 装完都要做这三步
@@ -157,27 +165,27 @@ dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge
 只把插件写进 profile **还不会**改 `@deepseek-ai`。
 
 1. **退出并重新打开**刚装的那个宿主：Web 关掉 `dsh web` 再开；桌面端退出托盘再打开对应 exe；dsh-go 直接重开 App。
-2. 在**这个宿主**点会话标题旁的 **dsh-purge**，在 **清洗** 页点 **「应用」**。宿主的设置页里没有这个条目。dsh-go 上用 [原生面板](dsh-go/README.md)：输入框上方的「清洗」状态条 / 加号面板。
+2. 在**这个宿主**打开 **DSH 设置 → dsh-purge-czx**，在 **清洗** 页点 **「应用」**。宿主的设置页里没有这个条目。dsh-go 上用 [原生面板](dsh-go/README.md)：输入框上方的「清洗」状态条 / 加号面板。
 3. 「应用」成功后会自动重启一次，让补丁进入当前进程。没做完不会重启。dsh-go 上插件不碰 App 的引擎进程，**要在 App「设置 → 引擎」里重启引擎**（或重开 App）。
 
 Web 的控件只动 Web，桌面端的只动桌面应用。不要在一个宿主里点另一个宿主的应用。
 
 ### 怎样算装上了
 
-- 会话标题旁有 **dsh-purge**，点开后在「清洗」里能点「应用」。
+- **DSH 设置**里有 **dsh-purge-czx**，点开后在「清洗」里能点「应用」。
 - 聊天里 `/purge status` 能打出 `DSH_HOME` 和补丁列表，路径应是你正在用的那一份。
 - 没装的可选包（例如梁神）显示跳过，不挡住应用完成。
 
 ### dsh-go 手机版（原生面板）
 
-dsh-go 的对话界面是 Flutter 原生界面，不加载网页版侧栏，所以会话标题旁那个按钮在手机上不会出现。装上 `dsh-go/` 里的原生面板后：
+dsh-go 的对话界面是 Flutter 原生界面，不加载网页版侧栏，所以手机上不会出现这个设置页入口。装上 `dsh-go/` 里的原生面板后：
 
 - 输入框上方有 **清洗 x/y** 状态条，点开是「破甲清洗」面板；
 - 加号面板里多了 **应用清洗** / **还原**；
 - 面板里能看到进度、待清洗补丁清单、宿主路径。
 
 ```sh
-dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx
 P="${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/dsh-go-purge"
 mkdir -p "$(dirname "$P")" && cp -r dsh-go "$P"
 dsh plugin --profile web add "$P"
@@ -194,23 +202,23 @@ dsh plugin --profile web add "$P"
 
 <!-- AI-AGENT-START -->
 
-安装 DeepSeek Harness 插件 `dsh-purge`，Web 和官方桌面端都要装。不要全盘搜索，不要读或改其它文件，不要应用设置，也不要重启应用。
+安装 DeepSeek Harness 插件 `dsh-purge-czx`，Web 和官方桌面端都要装。不要全盘搜索，不要读或改其它文件，不要应用设置，也不要重启应用。
 
-`dsh` 不在 PATH 就告诉用户后停止。当前目录已是本仓库时，把下面两条里的地址都换成 `.`。git 地址装不上，把地址换成 `https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz`。某个 profile 不存在就跳过那一条，另一条照装。
+`dsh` 不在 PATH 就告诉用户后停止。当前目录已是本仓库时，把下面两条里的地址都换成 `.`。git 地址装不上，把地址换成 `https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz`。某个 profile 不存在就跳过那一条，另一条照装。
 
 **Web 端（官方 `dsh web`）**
 
 ```sh
-dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
 **桌面端（官方 EXE）**
 
 ```sh
-dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge
+dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge-czx
 ```
 
-命令结束后，提醒用户：Web 完全退出并重启 `dsh web`；桌面端退出托盘再打开 EXE。各自点会话标题旁的 **dsh-purge**，在「清洗」里点「应用」。然后停止。
+命令结束后，提醒用户：Web 完全退出并重启 `dsh web`；桌面端退出托盘再打开 EXE。各自打开 **DSH 设置 → dsh-purge-czx**，在「清洗」里点「应用」。然后停止。
 
 <!-- AI-AGENT-END -->
 
@@ -242,32 +250,32 @@ $cands += @("$env:APPDATA\DeepSeek Harness\dsh-home", "$env:LOCALAPPDATA\DeepSee
 $cands | Select-Object -Unique | Where-Object { $_ -and (Test-Path (Join-Path $_ "profiles")) }
 ```
 
-**2. 把插件放到 `$DSH_HOME/plugins/dsh-purge`**（目录名必须是 `dsh-purge`，其 `package.json` 里 `"name"` 也必须是 `dsh-purge`）。
+**2. 把插件放到 `$DSH_HOME/plugins/dsh-purge-czx`**（目录名必须是 `dsh-purge-czx`，其 `package.json` 里 `"name"` 也必须是 `dsh-purge-czx`）。
 
 ```sh
-git clone https://github.com/czx455501074-afk/dsh-purge.git "$DSH_HOME/plugins/dsh-purge"
+git clone https://github.com/czx455501074-afk/dsh-purge-czx.git "$DSH_HOME/plugins/dsh-purge-czx"
 ```
 
-没有 git：下载 [master.tar.gz](https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz)，解压后把 `dsh-purge-master` 改名为 `dsh-purge`，整夹放到 `plugins` 下。已有本仓库副本就复制整个目录，不要只拷几个 `.js`。
+没有 git：下载 [master.tar.gz](https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz)，解压后把 `dsh-purge-czx-master` 改名为 `dsh-purge-czx`，整夹放到 `plugins` 下。已有本仓库副本就复制整个目录，不要只拷几个 `.js`。
 
 **3. 只改对应 profile 的 `package.json`，先备份。** Web → `$DSH_HOME/profiles/web/package.json`；桌面 → `$DSH_HOME/profiles/desktop/package.json`。**只追加两处**，原有依赖和 bundle 全部留着：
 
-1. `dependencies` 增加 `"dsh-purge": "file:../../plugins/dsh-purge"`
-2. `dsh.profile.bundles` **末尾**追加 `"dsh-purge"`（已有就不要再加）
+1. `dependencies` 增加 `"dsh-purge-czx": "file:../../plugins/dsh-purge-czx"`
+2. `dsh.profile.bundles` **末尾**追加 `"dsh-purge-czx"`（已有就不要再加）
 
 ```json
 {
   "name": "dsh-profile-web",
   "private": true,
   "dependencies": {
-    "dsh-purge": "file:../../plugins/dsh-purge"
+    "dsh-purge-czx": "file:../../plugins/dsh-purge-czx"
   },
   "dsh": {
     "profile": {
       "bundles": [
         "@deepseek-ai/dsh-base",
         "@deepseek-ai/dsh-web-app",
-        "dsh-purge"
+        "dsh-purge-czx"
       ],
       "patchReload": "live"
     }
@@ -275,7 +283,7 @@ git clone https://github.com/czx455501074-afk/dsh-purge.git "$DSH_HOME/plugins/d
 }
 ```
 
-JSON 要合法（新增项前面有逗号，最后一项后面没有多余逗号）。`file:../../plugins/dsh-purge` 不要改成绝对路径，`patchReload`、其它插件、版本号都不要动，`"dsh-purge"` 不要写两次。桌面端没有 `dsh-web-app` 就不要硬加。
+JSON 要合法（新增项前面有逗号，最后一项后面没有多余逗号）。`file:../../plugins/dsh-purge-czx` 不要改成绝对路径，`patchReload`、其它插件、版本号都不要动，`"dsh-purge-czx"` 不要写两次。桌面端没有 `dsh-web-app` 就不要硬加。
 
 **4. 只在刚改的那个 profile 目录装依赖**（`cd` 进 profile 目录，不要在仓库根或 `$DSH_HOME` 根）：
 
@@ -284,19 +292,19 @@ cd "$DSH_HOME/profiles/web"   # 或 profiles/desktop
 pnpm install
 ```
 
-成功标志：出现 `profiles/<web|desktop>/node_modules/dsh-purge/package.json`。找不到 `pnpm` 就用官方 `dsh` 自带的 Node / pnpm；报 `Could not resolve` 就检查 `file:` 路径；JSON 解析失败就修逗号或还原备份。
+成功标志：出现 `profiles/<web|desktop>/node_modules/dsh-purge-czx/package.json`。找不到 `pnpm` 就用官方 `dsh` 自带的 Node / pnpm；报 `Could not resolve` 就检查 `file:` 路径；JSON 解析失败就修逗号或还原备份。
 
-**5. 完全退出该宿主，再启动，再点「应用」** —— 和上面三步一样。按钮会出现在会话标题旁，只在这个宿主点「应用」（或 `/purge apply`）。没出现多半是改错了另一份 `.dsh`，回到第 1 步核对。
+**5. 完全退出该宿主，再启动，再点「应用」** —— 和上面三步一样。入口会出现在 DSH 设置页，只在这个宿主点「应用」（或 `/purge apply`）。没出现多半是改错了另一份 `.dsh`，回到第 1 步核对。
 
 </details>
 
 ### 卸载
 
-会话标题旁的 **dsh-purge** →「清洗」→「卸载」。弹窗确认：会先还原已应用的补丁，还原回原版 Harness，再重启当前宿主。
+**DSH 设置 → dsh-purge-czx** →「清洗」→「卸载」。弹窗确认：会先还原已应用的补丁，还原回原版 Harness，再重启当前宿主。
 
 ```sh
 # 也可以用命令行 / 聊天
-dsh-purge --uninstall
+dsh-purge-czx --uninstall
 # /purge uninstall
 ```
 
@@ -304,8 +312,8 @@ dsh-purge --uninstall
 
 ```yaml
 - insert:
-    - id: dsh-purge
-      name: 'dsh-purge'
+    - id: dsh-purge-czx
+      name: 'dsh-purge-czx'
       config:
         enabled: true
         autoApplyOnStart: true
@@ -320,13 +328,13 @@ dsh-purge --uninstall
 
 ## 界面
 
-会话标题旁有 **dsh-purge**。点开是右侧栏，两页：**清洗** 和 **演练台**。白 / 墨可切换。补丁按组展开，进度只计真正已应用的项。规则集在上方列表启用或删除，下方编辑正文。
+**dsh-purge-czx** 在 DSH **设置**里。这一页是唯一入口：两个页签，**清洗** 和 **演练台**。会话里不再有悬浮按钮、输入框按钮或标签栏芯片。白 / 墨可切换。补丁按组展开，进度只计真正已应用的项。规则集在上方列表启用或删除，下方编辑正文。
 
 第一次进演练台要先读声明、等倒计时、滚到文末并勾选三项。清洗不需要这一步。演练台只用于你有权管理的本机、离线靶标，或已经书面授权的演练环境。
 
 | 区域        | 说明                                                                                                         |
 | --------- | ---------------------------------------------------------------------------------------------------------- |
-| dsh-purge | 会话标题旁的按钮，打开或收起右侧栏                                                                                          |
+| dsh-purge-czx | 唯一入口：DSH 设置 → dsh-purge-czx |
 | 清洗        | 原来的规则设定：补丁、提示词、规则集、Skill                                                                                   |
 | 演练台       | 授权后的资产、技能与环境页。未授权时按钮标「未授权」                                                                                 |
 | 补丁        | 分组查看状态，应用、还原或卸载                                                                                            |
@@ -339,7 +347,7 @@ dsh-purge --uninstall
 
 ## 目录结构
 
-`bin/` 是命令行，`lib/` 是补丁和演练台，`presets/redteam/` 是红队预设，`skills/redteam/` 是随包技能，`client.js` 是侧栏。
+`bin/` 是命令行，`lib/` 是补丁和演练台，`presets/redteam/` 是红队预设，`skills/redteam/` 是随包技能，`client.js` 是设置页管理界面。
 
 运行时文件在 `$DSH_HOME`：`prompt-inject.md`、`rules/`、`skills/`、`net-scope-allow.txt`、`redteam/`。未设 `DSH_HOME` 时，优先用 dsh 安装目录旁边的 `.dsh`，再退回 `~/.dsh`。Web 和桌面端各用自己那一份主目录。Skill 不进注入段，也不顶替提示词。
 
@@ -349,11 +357,11 @@ dsh-purge --uninstall
 
 ```sh
 # CLI
-dsh-purge --status
-dsh-purge --apply
-dsh-purge --revert
-dsh-purge --uninstall
-dsh-purge --edit
+dsh-purge-czx --status
+dsh-purge-czx --apply
+dsh-purge-czx --revert
+dsh-purge-czx --uninstall
+dsh-purge-czx --edit
 
 # 聊天
 /purge status | apply | revert | uninstall | edit | help
@@ -373,7 +381,7 @@ purge_status   purge_apply   purge_revert
 
 ### 响应速度
 
-DSH 会按顺序执行同一批中的 Bash 调用。旧版 dsh-purge 把默认前台等待从 60 秒提高到了 10 分钟，一条慢命令会让后续调用一起等待。补丁 #21 现在把带插件标记的旧值恢复为官方的 60 秒。无标记的等待时间和其他自定义值会保留；无标记的 10 分钟无法可靠地区分是插件旧值还是用户设置。
+DSH 会按顺序执行同一批中的 Bash 调用。旧版 dsh-purge-czx 把默认前台等待从 60 秒提高到了 10 分钟，一条慢命令会让后续调用一起等待。补丁 #21 现在把带插件标记的旧值恢复为官方的 60 秒。无标记的等待时间和其他自定义值会保留；无标记的 10 分钟无法可靠地区分是插件旧值还是用户设置。
 
 在 macOS/Linux 的 `dsh web` 中，如需更快返回工具结果，可在 `$DSH_HOME/profiles/web/cordis.patch.yml`（通常是 `~/.dsh/profiles/web/cordis.patch.yml`）添加下面的条目。已有相同 id 时修改原条目，不要重复添加。这个 profile 覆盖层在内置配置之后加载，后续应用插件会保留它。
 
@@ -401,9 +409,9 @@ DSH 会按顺序执行同一批中的 Bash 调用。旧版 dsh-purge 把默认�
 
 中国大陆、香港、澳门的地址默认禁止。只有事先登记的那一台可以例外。在对话里说「这是我的服务器」不会放行。密钥和密码也不会。
 
-这一栏在提示词下面。若侧栏里还没有它，先完全退出 DeepSeek Harness，再重新打开。
+这一栏在提示词下面。若设置页里还没有它，先完全退出 DeepSeek Harness，再重新打开。
 
-1. 点会话标题旁的 **dsh-purge**，停在 **清洗**。
+1. 打开 **DSH 设置 → dsh-purge-czx**，停在 **清洗**。
 2. 往下滚过 **提示词**，下面就是 **自己的服务器**。
 3. 每行只写一台，用下面三种写法之一：
   - `203.0.113.10`：一个 IP。
@@ -453,7 +461,7 @@ flowchart TD
 
 
 
-每一轮的提示词注入与规则集决策。左边三个输入就是你在 dsh-purge 面板里控制的东西，虚线表示它们各自驱动哪一步判定：
+每一轮的提示词注入与规则集决策。左边三个输入就是你在 dsh-purge-czx 面板里控制的东西，虚线表示它们各自驱动哪一步判定：
 
 ```mermaid
 flowchart TD
@@ -495,7 +503,7 @@ flowchart TD
   B --> C{"effectivePolicy === 'never'?"}
   C -->|是，原宿主| X["直接 rejected，瀑布都不进"]
   C -->|被插件降级为 ask| D["approval/request 瀑布"]
-  D --> E["dsh-purge handler（prepend，最外层）"]
+  D --> E["dsh-purge-czx handler（prepend，最外层）"]
   E --> F["返回 allowed-once：放行，不弹窗"]
   D --> G["浏览器审批 UI / ACP 应答器（已被外层盖住，不会执行）"]
 ```
@@ -508,8 +516,8 @@ flowchart TD
   只改装配后的 context、不自己注册：主动注册 `approval:policy` 会与 ApprovalService 自身的注册重名，把审批服务整个打掉。
 - **refreshContext 出口守卫**：只改 `assemble` 的返回值不够 —— 发请求前 `agent-loop` 还会调 `systemPrompt.refreshContext()`，
   它按已注册 provider 重新解析并覆盖回原文。插件在 `refreshContext` 的返回处再改一次，两个入口都覆盖才真正落到模型。
-- **开关**：插件配置 `approvalBypass`（默认 `true`），或写 `$DSH_HOME/dsh-purge/approval-bypass.json`
-  （`{"approvalBypass": false}`），面板与 `POST /dsh-purge/approval-bypass` 都能热切换。
+- **开关**：插件配置 `approvalBypass`（默认 `true`），或写 `$DSH_HOME/dsh-purge-czx/approval-bypass.json`
+  （`{"approvalBypass": false}`），面板与 `POST /dsh-purge-czx/approval-bypass` 都能热切换。
   关掉后 `never` 恢复宿主原语义：不弹窗、直接拒绝。
 
 Skill 不进注入段：
@@ -555,14 +563,14 @@ flowchart LR
 
 ## 更新
 
-每一版改了什么、安装包在 [Releases](https://github.com/czx455501074-afk/dsh-purge/releases)。发新版时把 `package.json` 的版本号改掉，中英文说明写进 `release-notes.md`，推到 `master` 就会自动打包。同一版本再推送不会重复发包。
+每一版改了什么、安装包在 [Releases](https://github.com/czx455501074-afk/dsh-purge-czx/releases)。发新版时把 `package.json` 的版本号改掉，中英文说明写进 `release-notes.md`，推到 `master` 就会自动打包。同一版本再推送不会重复发包。
 
 ## 说明
 
 - 改动范围是本机 `@deepseek-ai/*` 包里的渲染文案、默认策略和执行逻辑，以及用户目录下的覆盖文件与规则集。
 - 升级后原文对不上会显示跳过，这次应用仍算完成，不会乱改。
 - 不改动非 `@deepseek-ai` 的第三方插件源仓库（启动时的 CMD 无感会**尽力**修补已装的 doctor / market / 梁神 / mnemon，属运行时补丁）。
-- 安装只走本仓库地址：`dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge` 或 `dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge`。当前目录已是本仓库时 `add .`。git 装不上再加 master.tar.gz。
+- 安装只走本仓库地址：`dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx` 或 `dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge-czx`。当前目录已是本仓库时 `add .`。git 装不上再加 master.tar.gz。
 
 ---
 

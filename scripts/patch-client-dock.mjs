@@ -1,7 +1,14 @@
 /**
- * 把 client.js 改成右侧 dsh-purge 双页签（清洗 + 演练台），并嵌入 vendor 演练台 UI。
+ * 把 client.js 改成右侧 dsh-purge-czx 双页签（清洗 + 演练台），并嵌入 vendor 演练台 UI。
  * node scripts/patch-client-dock.mjs
  */
+/**
+ * 已弃用（dsh-purge-czx 2.0）：插件只保留 DSH 设置页一个管理入口，
+ * 不再向 client.js 注入右下角悬浮按钮 / 首页芯片 / 标签栏芯片 / dock 双页签。
+ * 保留本文件仅为历史参考；直接运行会退出，避免把删掉的按钮加回来。
+ */
+console.error("[deprecated] dsh-purge-czx 2.0 只保留设置页入口，不再生成 dock/launcher UI。");
+process.exit(1);
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,11 +29,11 @@ let client = readFileSync(clientPath, "utf8").replace(/\r\n/g, "\n");
 if (!client.includes('"dock.clean"')) {
 	client = client.replace(
 		'\t\t\tnav: "规则设定",',
-		`\t\t\tnav: "dsh-purge",
+		`\t\t\tnav: "dsh-purge-czx",
 			"dock.clean": "清洗",
 			"dock.drill": "演练台",
-			"dock.toggle": "dsh-purge",
-			"dock.newSession": "dsh-purge",
+			"dock.toggle": "dsh-purge-czx",
+			"dock.newSession": "dsh-purge-czx",
 			"dock.full": "全面浏览",
 			"dock.close": "收起",
 			"dock.unauthorized": "未授权",
@@ -46,11 +53,11 @@ if (!client.includes('"dock.clean"')) {
 	);
 	client = client.replace(
 		'\t\t\tnav: "Rules",',
-		`\t\t\tnav: "dsh-purge",
+		`\t\t\tnav: "dsh-purge-czx",
 			"dock.clean": "Clean",
 			"dock.drill": "Drill",
-			"dock.toggle": "dsh-purge",
-			"dock.newSession": "dsh-purge",
+			"dock.toggle": "dsh-purge-czx",
+			"dock.newSession": "dsh-purge-czx",
 			"dock.full": "Full view",
 			"dock.close": "Collapse",
 			"dock.unauthorized": "Unauthorized",
@@ -136,7 +143,7 @@ if (!client.includes(".dshp-dock{")) {
 
 // 3) Insert dock/auth/marker block before installRewindUi
 const dockBlock = `
-		const AUTH_KEY = "dsh-purge-drill-auth";
+		const AUTH_KEY = "dsh-purge-czx-drill-auth";
 		const AUTH_LEGAL_HTML = ${JSON.stringify(LEGAL)};
 
 		${BEGIN}
@@ -278,11 +285,11 @@ const dockBlock = `
 			useEffect(() => {
 				if (!__dshPurgeDrill || !__dshPurgeDrill.CSS) return undefined;
 				const styleTag = document.createElement("style");
-				styleTag.setAttribute("data-dsh-purge-drill", "1");
+				styleTag.setAttribute("data-dsh-purge-czx-drill", "1");
 				styleTag.textContent = __dshPurgeDrill.CSS;
 				document.head.append(styleTag);
 				const widthTag = document.createElement("style");
-				widthTag.setAttribute("data-dsh-purge-dock-w", "1");
+				widthTag.setAttribute("data-dsh-purge-czx-dock-w", "1");
 				widthTag.textContent = ":root{--dshp-dock-w:620px;--rt-dock-w:620px}";
 				document.head.append(widthTag);
 				try { if (__dshPurgeDrill.setDockWidth) __dshPurgeDrill.setDockWidth(620); } catch { /* ignore */ }
@@ -305,7 +312,7 @@ const dockBlock = `
 			return h(react.Fragment, null,
 				h("div", { className: "dshp-dock", "data-open": st.open ? "1" : "0" },
 					h("div", { className: "dshp-dock-head" },
-						h("b", null, "dsh-purge"),
+						h("b", null, "dsh-purge-czx"),
 						h("span", { style: { flex: 1 } }),
 						st.tab === "drill" && readDrillAuth()
 							? h("button", { type: "button", onClick: () => requestDrill("full") }, t("dock.full"))
@@ -385,12 +392,12 @@ if (!client.includes("function PurgeDock()")) {
 
 // 4) Replace apply() settings.section with dock slots
 const oldApply = `		function apply(ctx) {
-			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge: dictionaries");
+			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge-czx: dictionaries");
 			const t = ctx.locale.bind(NS);
 			translate = t;
 			ctx.slots.inject("settings.section", () => ctx.slots.register({
 				name: "settings.section",
-				id: "dsh-purge",
+				id: "dsh-purge-czx",
 				order: 40,
 				label: () => t("nav"),
 				locale: NS,
@@ -408,12 +415,12 @@ const oldApply = `		function apply(ctx) {
 		}`;
 
 const newApply = `		function apply(ctx) {
-			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge: dictionaries");
+			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge-czx: dictionaries");
 			const t = ctx.locale.bind(NS);
 			translate = t;
 			ctx.slots.inject("shell.overlay", () => ctx.slots.register({
 				name: "shell.overlay",
-				id: "dsh-purge-dock",
+				id: "dsh-purge-czx-dock",
 				order: 50,
 			}, () => h(react.Fragment, null, h(PurgeDock), h(HeroNewSessionMount), h(TabRowPurgeMount), h(EnvAdaptSendGate))));
 			try {
@@ -433,7 +440,7 @@ const newApply = `		function apply(ctx) {
 			}
 		}`;
 
-if (client.includes('id: "dsh-purge-dock"')) {
+if (client.includes('id: "dsh-purge-czx-dock"')) {
 	// already patched apply
 } else if (client.includes(oldApply)) {
 	client = client.replace(oldApply, newApply);

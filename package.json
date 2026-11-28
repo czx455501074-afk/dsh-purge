@@ -1,6 +1,6 @@
 {
-  "name": "dsh-purge",
-  "version": "1.2.3",
+  "name": "dsh-purge-czx",
+  "version": "2.0.0",
   "description": "DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分",
   "type": "module",
   "main": "lib/index.js",
@@ -16,7 +16,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "dsh-purge": "bin/dsh-purge.js"
+    "dsh-purge-czx": "bin/dsh-purge-czx.js"
   },
   "files": [
     "lib",
@@ -57,13 +57,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/czx455501074-afk/dsh-purge.git"
+    "url": "git+https://github.com/czx455501074-afk/dsh-purge-czx.git"
   },
-  "homepage": "https://github.com/czx455501074-afk/dsh-purge#readme",
+  "homepage": "https://github.com/czx455501074-afk/dsh-purge-czx#readme",
   "bugs": {
-    "url": "https://github.com/czx455501074-afk/dsh-purge/issues"
+    "url": "https://github.com/czx455501074-afk/dsh-purge-czx/issues"
   },
   "dsh": {
+    "target": "0.2.2-rc.5",
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
@@ -79,9 +80,9 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz",
-      "zip": "https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.zip",
-      "git": "https://github.com/czx455501074-afk/dsh-purge.git"
+      "tarball": "https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz",
+      "zip": "https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.zip",
+      "git": "https://github.com/czx455501074-afk/dsh-purge-czx.git"
     }
   },
   "publishConfig": {
@@ -91,7 +92,7 @@
     "@deepseek-ai/cordis": "^4.0.1"
   },
   "engines": {
-    "node": ">=18"
-  },
-  "dshTarget": "0.2.2-rc.1"
+    "node": ">=18",
+    "dsh": ">=0.2.2-rc.1 <0.3.0"
+  }
 }

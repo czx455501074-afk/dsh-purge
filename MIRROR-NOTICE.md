@@ -1,12 +1,12 @@
 # 来源与署名 / Source and attribution
 
-本仓库 **czx455501074-afk/dsh-purge** 是 **dsh-purge — DeepSeek Harness 破甲** 的分发副本，由 czx 维护。
+本仓库 **czx455501074-afk/dsh-purge-czx** 是 **dsh-purge-czx — DeepSeek Harness 破甲** 的分发副本，由 czx 维护。
 
 ## 一、署名
 
 | 项 | 内容 |
 | --- | --- |
-| 原项目 | dsh-purge — DeepSeek Harness 破甲（让所有模型都能破甲，不同模型可换不同提示词） |
+| 原项目 | dsh-purge-czx — DeepSeek Harness 破甲（让所有模型都能破甲，不同模型可换不同提示词） |
 | 原作者 | **YuJunZhiXue**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)） |
 | 原仓库 | <https://github.com/YuJunZhiXue/dsh-purge> |
 | 原许可证 | MIT License（本仓库 `LICENSE` 原样保留，未做任何改动） |
@@ -17,9 +17,9 @@
 
 ## 二、安装只走本仓库地址
 
-- Git：`dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge`
-- 桌面端：`dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge`
-- 压缩包：<https://github.com/czx455501074-afk/dsh-purge/archive/refs/heads/master.tar.gz>
+- Git：`dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx`
+- 桌面端：`dsh plugin --profile desktop add https://github.com/czx455501074-afk/dsh-purge-czx`
+- 压缩包：<https://github.com/czx455501074-afk/dsh-purge-czx/archive/refs/heads/master.tar.gz>
 - 已在仓库目录里：把地址换成 `add .`
 
 `package.json` 的 `repository` / `homepage` / `bugs` / `dsh.install`（tarball、zip、git）全部指向本仓库；插件内更新检查（`lib/update.js`、`lib/redteam/ui.js`）与侧栏欢迎链接（`client.js`）同样指向本仓库，不再回上游。

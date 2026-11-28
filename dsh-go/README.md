@@ -6,8 +6,8 @@ dsh-go 手机 App 的对话界面是 Flutter 原生界面，不加载 Harness �
 ## 安装
 
 ```sh
-# 1) dsh-purge 本体（和网页版同一个包）
-dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge
+# 1) dsh-purge-czx 本体（和网页版同一个包）
+dsh plugin --profile web add https://github.com/czx455501074-afk/dsh-purge-czx
 
 # 2) 原生面板：复制到 dsh-go 的插件目录再装
 P="${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/dsh-go-purge"
@@ -34,27 +34,27 @@ dsh plugin --profile web add "$P"
 App 启动引擎时会先用自带运行时还原 `/opt/dsh`，所以 `--apply` 写进去的补丁到下次启动就没了（面板状态会回到全 pending）。装一个启动钩子解决：
 
 ```sh
-dsh-purge --boot-hook-install
+dsh-purge-czx --boot-hook-install
 ```
 
-它在启动器 `/usr/local/bin/dsh` 的 `node` 后面加了一个 `--import=$DSH_HOME/dsh-purge-boot.mjs`，位置在官方的 boot-cache 之前。每次引擎启动时，钩子先重打补丁、再让 DSH 加载模块，所以**同一轮启动就是补丁后的宿主**（约 2 秒开销）。
+它在启动器 `/usr/local/bin/dsh` 的 `node` 后面加了一个 `--import=$DSH_HOME/dsh-purge-czx-boot.mjs`，位置在官方的 boot-cache 之前。每次引擎启动时，钩子先重打补丁、再让 DSH 加载模块，所以**同一轮启动就是补丁后的宿主**（约 2 秒开销）。
 
-- 日志：`$DSH_HOME/dsh-purge/boot-hook.log`（每次启动一行 applied / failed / ms）；
+- 日志：`$DSH_HOME/dsh-purge-czx/boot-hook.log`（每次启动一行 applied / failed / ms）；
 - App 升级运行时会重写启动器，升级后重新执行一次 `--boot-hook-install`；
-- 移除：`dsh-purge --boot-hook-remove`（从 `.dshpurge.bak` 逐字节还原启动器）；
+- 移除：`dsh-purge-czx --boot-hook-remove`（从 `.dshpurge.bak` 逐字节还原启动器）；
 - 临时跳过：`DSH_PURGE_BOOT_HOOK=0 dsh web ...`；
-- 状态：`dsh-purge --boot-hook-status`。
+- 状态：`dsh-purge-czx --boot-hook-status`。
 
 面板不会注入 App 管理的启动器其他内容；需要终端里的 `dsh` 也带 `DSH_HOME` 时，仍可设 `DSH_PURGE_PATCH_SHIM=1`。
 
 ## 卸载
 
 ```sh
-dsh plugin --profile web remove local-dsh-purge
+dsh plugin --profile web remove local-dsh-purge-czx
 rm -rf "${DSH_HOME:-$HOME/.dsh}/dsh-go/plugins/dsh-go-purge"
 ```
 
-先还原再卸载：面板 → 还原，或 `dsh-purge --revert`。
+先还原再卸载：面板 → 还原，或 `dsh-purge-czx --revert`。
 
 ## 开发自查
 

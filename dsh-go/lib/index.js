@@ -1,12 +1,12 @@
-// dsh-purge 的 dsh-go 手机原生面板。
+// dsh-purge-czx 的 dsh-go 手机原生面板。
 // 运行在引擎（Node）里；App 只画 package.json 的 dshGo 清单和这里返回的视图。
-// 实际清洗逻辑复用 dsh-purge 包的 lib/core.js，避免两套补丁表。
+// 实际清洗逻辑复用 dsh-purge-czx 包的 lib/core.js，避免两套补丁表。
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
-export const name = 'local-dsh-purge'
+export const name = 'local-dsh-purge-czx'
 
 const PANEL_ID = 'purge'
 const PLUGIN_DIR = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
@@ -16,7 +16,7 @@ function dshHome() {
   return home || path.join(os.homedir(), '.dsh')
 }
 
-/** 找 dsh-purge 包根：环境变量 → 各 profile 的 node_modules → 本插件旁边 → dsh-go/plugins。 */
+/** 找 dsh-purge-czx 包根：环境变量 → 各 profile 的 node_modules → 本插件旁边 → dsh-go/plugins。 */
 function purgeRoots() {
   const home = dshHome()
   const roots = []
@@ -24,14 +24,14 @@ function purgeRoots() {
   if (env) roots.push(env)
   try {
     for (const name of fs.readdirSync(path.join(home, 'profiles'))) {
-      roots.push(path.join(home, 'profiles', name, 'node_modules', 'dsh-purge'))
+      roots.push(path.join(home, 'profiles', name, 'node_modules', 'dsh-purge-czx'))
     }
   } catch { /* 没有 profiles */ }
-  // 仓库 / 解压目录布局：插件在 dsh-purge/dsh-go/ 下。
+  // 仓库 / 解压目录布局：插件在 dsh-purge-czx/dsh-go/ 下。
   roots.push(path.resolve(PLUGIN_DIR, '..'))
-  roots.push(path.resolve(PLUGIN_DIR, '..', 'dsh-purge'))
-  roots.push(path.join(home, 'dsh-go', 'plugins', 'dsh-purge'))
-  roots.push(path.join(home, 'plugins', 'dsh-purge'))
+  roots.push(path.resolve(PLUGIN_DIR, '..', 'dsh-purge-czx'))
+  roots.push(path.join(home, 'dsh-go', 'plugins', 'dsh-purge-czx'))
+  roots.push(path.join(home, 'plugins', 'dsh-purge-czx'))
   return roots
 }
 
@@ -50,7 +50,7 @@ async function loadCore() {
       } catch { /* 老版本没有 ALL_PATCHES 也不挡主流程 */ }
       return core
     }
-    throw new Error('没有找到 dsh-purge 包（先 dsh plugin --profile web add dsh-purge）')
+    throw new Error('没有找到 dsh-purge-czx 包（先 dsh plugin --profile web add dsh-purge-czx）')
   })()
   try {
     return await corePromise
@@ -75,7 +75,7 @@ function bootHookInstalled() {
   try {
     const shim = ['/usr/local/bin/dsh', '/usr/bin/dsh', '/bin/dsh'].find((fp) => fs.existsSync(fp))
     if (!shim) return false
-    return fs.readFileSync(shim, 'utf8').includes('dsh-purge-boot.mjs')
+    return fs.readFileSync(shim, 'utf8').includes('dsh-purge-czx-boot.mjs')
   } catch {
     return false
   }
@@ -106,16 +106,16 @@ function summarize(state) {
     bootHook: bootHookInstalled(),
     bootHookText: bootHookInstalled()
       ? '启动钩子：已装，每次启动自动重打'
-      : '启动钩子：未装，重启引擎后补丁会丢（dsh-purge --boot-hook-install）',
+      : '启动钩子：未装，重启引擎后补丁会丢（dsh-purge-czx --boot-hook-install）',
     note: state?.ai_base
       ? '应用后到 App「引擎」页重启引擎才生效'
-      : '没找到 @deepseek-ai。先装 dsh-purge，再回来点应用',
+      : '没找到 @deepseek-ai。先装 dsh-purge-czx，再回来点应用',
   }
 }
 
 let bootHookPromise = null
 
-/** dsh-purge 包里的启动钩子安装器(手机会话里不方便敲 CLI 时,面板直接装)。 */
+/** dsh-purge-czx 包里的启动钩子安装器(手机会话里不方便敲 CLI 时,面板直接装)。 */
 async function loadBootHook() {
   if (bootHookPromise) return bootHookPromise
   bootHookPromise = (async () => {
@@ -124,7 +124,7 @@ async function loadBootHook() {
       if (!fs.existsSync(entry)) continue
       return import(pathToFileURL(entry).href)
     }
-    throw new Error('没找到 lib/boot-hook.js,先升级 dsh-purge')
+    throw new Error('没找到 lib/boot-hook.js,先升级 dsh-purge-czx')
   })()
   try {
     return await bootHookPromise
@@ -163,7 +163,7 @@ async function selfHealBootHook() {
     if (bootHookInstalled()) return
     const api = await loadBootHook()
     const r = api.installBootHook(dshHome())
-    const logFile = path.join(dshHome(), 'dsh-purge', 'boot-hook.log')
+    const logFile = path.join(dshHome(), 'dsh-purge-czx', 'boot-hook.log')
     fs.mkdirSync(path.dirname(logFile), { recursive: true })
     fs.appendFileSync(logFile, `[${new Date().toISOString()}] auto-install ok=${r.ok ? 1 : 0} ${r.error || ''}\n`)
   } catch { /* 自愈失败不影响插件其余功能 */ }
@@ -232,7 +232,7 @@ export function apply(ctx) {
             if (!alive) return
             emit(summarize(state))
           } catch {
-            if (alive) emit({ applied: 0, total: 0, percent: 0, pending: [], pendingCount: 0, host: '—', home: '—', note: zh ? '没找到 dsh-purge 包' : 'dsh-purge package not found' })
+            if (alive) emit({ applied: 0, total: 0, percent: 0, pending: [], pendingCount: 0, host: '—', home: '—', note: zh ? '没找到 dsh-purge-czx 包' : 'dsh-purge-czx package not found' })
           }
         }
         void paint(false)

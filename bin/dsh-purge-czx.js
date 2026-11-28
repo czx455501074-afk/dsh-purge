@@ -7,7 +7,7 @@ const args = process.argv.slice(2);
 
 function printStatus(state) {
   const out = [];
-  out.push("dsh-purge 状态 / Status");
+  out.push("dsh-purge-czx 状态 / Status");
   out.push("  宿主 / surface " + (state.surface || "web") + (state.dsh_go ? " (dsh-go)" : ""));
   out.push("  DSH_HOME      " + state.dsh_home);
   if (state.desktop_install) out.push("  桌面安装       " + state.desktop_install);
@@ -40,16 +40,16 @@ async function main() {
     "--boot-hook-install", "--boot-hook-remove", "--boot-hook-status"].includes(a));
 
   if (mode === "--help" || args.includes("-h")) {
-    console.log(`dsh-purge 用法:
-  dsh-purge --status     显示状态
-  dsh-purge --apply      应用全部清洗（提示词+代码+shim+override）
-  dsh-purge --revert     回滚还原
-  dsh-purge --uninstall  卸载插件（已应用则先还原）
-  dsh-purge --edit       编辑注入文件 prompt-inject.md
-  dsh-purge --boot-hook-install   dsh-go: 让补丁在 App 每次启动时自动重打（改写启动器 --import）
-  dsh-purge --boot-hook-remove    移除启动钩子并还原启动器
-  dsh-purge --boot-hook-status    查看启动钩子状态
-  dsh-purge --help       帮助`);
+    console.log(`dsh-purge-czx 用法:
+  dsh-purge-czx --status     显示状态
+  dsh-purge-czx --apply      应用全部清洗（提示词+代码+shim+override）
+  dsh-purge-czx --revert     回滚还原
+  dsh-purge-czx --uninstall  卸载插件（已应用则先还原）
+  dsh-purge-czx --edit       编辑注入文件 prompt-inject.md
+  dsh-purge-czx --boot-hook-install   dsh-go: 让补丁在 App 每次启动时自动重打（改写启动器 --import）
+  dsh-purge-czx --boot-hook-remove    移除启动钩子并还原启动器
+  dsh-purge-czx --boot-hook-status    查看启动钩子状态
+  dsh-purge-czx --help       帮助`);
     return;
   }
 
@@ -181,6 +181,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  console.error("[dsh-purge] error:", e);
+  console.error("[dsh-purge-czx] error:", e);
   process.exit(1);
 });

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * dsh-purge boot hook (dsh-go).
+ * dsh-purge-czx boot hook (dsh-go).
  *
  * The dsh-go app restores /opt/dsh from its bundled runtime on every engine start, so the file
- * patches written by `dsh-purge --apply` are gone by the next launch. This preload runs before
+ * patches written by `dsh-purge-czx --apply` are gone by the next launch. This preload runs before
  * DSH imports its own modules, re-applies the patches to disk, and lets the same boot load the
  * patched files.
  *
- * Installed as `--import` in the /usr/local/bin/dsh shim by `dsh-purge --boot-hook-install`.
+ * Installed as `--import` in the /usr/local/bin/dsh shim by `dsh-purge-czx --boot-hook-install`.
  * Every failure is swallowed: a broken hook must never keep the engine from starting.
  */
 import fs from "node:fs";
@@ -16,8 +16,8 @@ import os from "node:os";
 import { pathToFileURL } from "node:url";
 
 const HOME = process.env.DSH_HOME || path.join(os.homedir(), ".dsh");
-const LOG = path.join(HOME, "dsh-purge", "boot-hook.log");
-const LOCK = path.join(HOME, "dsh-purge", "boot-hook.lock");
+const LOG = path.join(HOME, "dsh-purge-czx", "boot-hook.log");
+const LOCK = path.join(HOME, "dsh-purge-czx", "boot-hook.lock");
 const LOCK_TTL_MS = 300_000;
 
 function log(line) {
@@ -37,11 +37,11 @@ function resolveRoot() {
   try {
     const profiles = fs.readdirSync(path.join(HOME, "profiles"));
     for (const name of profiles) {
-      const found = probe(path.join(HOME, "profiles", name, "node_modules", "dsh-purge"));
+      const found = probe(path.join(HOME, "profiles", name, "node_modules", "dsh-purge-czx"));
       if (found) return found;
     }
   } catch { /* no profiles yet */ }
-  return probe(path.join(HOME, "plugins", "dsh-purge"));
+  return probe(path.join(HOME, "plugins", "dsh-purge-czx"));
 }
 
 function takeLock() {
@@ -66,7 +66,7 @@ if (process.env.DSH_PURGE_BOOT_HOOK !== "0" && !process.env.DSH_PURGE_BOOT_HOOKE
     try {
       const root = resolveRoot();
       if (!root) {
-        log("skip: dsh-purge not found");
+        log("skip: dsh-purge-czx not found");
       } else {
         const mod = await import(pathToFileURL(path.join(root, "lib", "core.js")).href);
         // applyPatchesAllHosts 会往 stdout 打进度,Web 启动时那会污染 DSH 的输出解析。
