@@ -1,3 +1,21 @@
+# 2.1.0
+
+## 中文
+
+- **多模型破甲提示词包**：`presets/model-prompts/` 14 个文件（通用骨架 + 13 家族），按会话模型 id 自动叠加，顺序 universal → family → extra。
+- **自动识别**：探测 `agent.session.header.model` / `agent.options.model` / `agent.config.model` / 会话 header，未知落 generic；设置页「模型提示词」页签可切 `auto / universal / family / off` 或强制家族。
+- **落地可改**：复制到 `$DSH_HOME/dsh-purge-czx/model-prompts/`，升级只补缺失；配置 `model-adapt.json` 的 `mode` / `family` / `extra`。
+- **新增** `purge_models` 工具与 `/dsh-purge-czx/model-adapt` 路由。
+- **测试**：新增 `scripts/test-model-adapt.mjs`（34 项），`npm test` 串联执行。
+
+## English
+
+- **Multi-model prompt packs**: 14 files under `presets/model-prompts/` (universal backbone + 13 families), auto-composed per session model id in the order universal → family → extra.
+- **Auto-detection**: probes `agent.session.header.model`, `agent.options.model`, `agent.config.model` and the session header; unknown ids fall back to generic. The Settings "Model prompts" tab switches `auto / universal / family / off` or forces a family.
+- **Editable on disk**: copied to `$DSH_HOME/dsh-purge-czx/model-prompts/`; upgrades only fill missing files. Config: `model-adapt.json` (`mode` / `family` / `extra`).
+- **New** `purge_models` tool and `/dsh-purge-czx/model-adapt` route.
+- **Tests**: `scripts/test-model-adapt.mjs` (34 checks) wired into `npm test`.
+
 # 1.2.3
 
 ## 中文

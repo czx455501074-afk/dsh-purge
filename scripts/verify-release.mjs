@@ -57,6 +57,16 @@ ok(idx.includes("migrateLegacyStateDir"), "state migration wired into apply()");
 const core = read("lib/core.js");
 ok(core.includes("export function migrateLegacyStateDir"), "core migration helper present");
 ok(core.includes("[dsh-purge]") || core.includes("dsh-purge-czx:"), "patch markers preserved for rollback");
+const ma = read("lib/model-adapt.js");
+ok(ma.includes("export function composeOverlay") && ma.includes("export function overlayForContext"), "model-adapt exports present");
+ok(ma.includes("export const FAMILIES"), "model-adapt family table present");
+ok(idx.includes('name: "purge_models"'), "purge_models tool registered");
+ok(idx.includes("/dsh-purge-czx/model-adapt"), "model-adapt http route registered");
+ok(idx.includes("appendModelAdapt"), "model overlay appended in inject path");
+const packRoot = join(root, "presets/model-prompts");
+for (const f of ["universal.md", "claude.md", "gpt.md", "gemini.md", "grok.md", "deepseek.md", "qwen.md", "kimi.md", "glm.md", "minimax.md", "doubao.md", "llama.md", "mistral.md", "generic.md"]) {
+  ok(existsSync(join(packRoot, f)) && statSync(join(packRoot, f)).size > 300, "prompt pack " + f);
+}
 
 ok(!existsSync(join(root, "bin/dsh-purge.js")), "old bin/dsh-purge.js removed");
 ok(existsSync(join(root, "bin/dsh-purge-czx.js")), "bin/dsh-purge-czx.js present");

@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge-czx)</h1>
 
-<p align="center"><strong>Version 1.2.3</strong></p>
+<p align="center"><strong>Version 2.1.0</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness jailbreak: every model, swap prompts per model. Default prompt for 小码酱. Please star ⭐ If you build on this, see Attribution required.</em>
@@ -30,6 +30,14 @@
 > Adding the plugin to a profile does not patch the host. Open **Settings → dsh-purge-czx** → **Clean** → **Apply**. A successful Apply restarts; an unfinished Apply does not. After the restart, start a new chat — that is when the inject enters the session.
 >
 > Node.js **≥18**. Windows no-flash needs **Node ≥22**. The install commands below all point at this repository (`https://github.com/czx455501074-afk/dsh-purge-czx`), not the old npm package.
+
+## What's new in 2.1
+
+- **Multi-model jailbreak prompt packs.** `presets/model-prompts/` ships a universal backbone plus 13 family packs (claude / gpt / gemini / grok / deepseek / qwen / kimi / glm / minimax / doubao / llama / mistral / generic). The overlay is composed per session: universal → family → your own tail.
+- **Auto-detection with manual override.** Probes `agent.session.header.model`, `agent.options.model`, `agent.config.model` and the session header; unknown ids fall back to generic. A new **Model prompts** tab in Settings switches `auto / universal / family / off` and can force a family.
+- **Editable on disk.** The pack is copied to `$DSH_HOME/dsh-purge-czx/model-prompts/`; upgrades only fill in missing files and never overwrite your edits. Config lives in `$DSH_HOME/dsh-purge-czx/model-adapt.json` (`mode` / `family` / `extra`).
+- **Tool and endpoint.** `purge_models` (status / list / set / sync / preview) and `GET|POST /dsh-purge-czx/model-adapt`.
+- **Tests.** `npm test` gains 34 model-adapt checks: detection matrix, idempotent seeding, composition order, mode switching, custom families, cache invalidation.
 
 ## What's new in 2.0
 

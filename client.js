@@ -136,6 +136,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge-czx", factory: (require) => {
 			"dock.full": "全面浏览",
 			"dock.close": "收起",
 			"dock.unauthorized": "未授权",
+			"dock.models": "模型提示词",
 			"nav.title": "破甲管理",
 			"nav.desc": "本页是 dsh-purge-czx 的唯一管理入口：清洗补丁、提示词注入、环境适配与红队演练台都在这里。",
 			"welcome.title": "用户须知",
@@ -482,6 +483,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge-czx", factory: (require) => {
 			"dock.full": "Full view",
 			"dock.close": "Collapse",
 			"dock.unauthorized": "Unauthorized",
+			"dock.models": "Model prompts",
 			"nav.title": "Purge console",
 			"nav.desc": "The only entry point for dsh-purge-czx: patches, prompt injection, environment adaptation and the drill console all live here.",
 			"welcome.title": "User notice",
@@ -965,6 +967,14 @@ body[data-ds-dark-theme] .dshp-restart-card .dshp-btn-primary,body[data-ds-dark-
 .dshp-settings-tab.on{color:var(--dsw-alias-label-primary,#f2f2f2);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 16%,transparent);border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 40%,transparent)}
 .dshp-settings-tab:hover{color:var(--dsw-alias-label-primary,#f2f2f2)}
 .dshp-settings-body{min-height:340px}
+.dshp-models{display:flex;flex-direction:column;gap:10px}
+.dshp-models-meta{margin:0;color:var(--dsw-alias-label-secondary,#999);font-size:12px;line-height:1.6}
+.dshp-models-err{margin:0;color:#f87171;font-size:12px}
+.dshp-models-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dshp-models-row label{font-size:12px;color:var(--dsw-alias-label-secondary,#999)}
+.dshp-models-list{margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--dsw-alias-label-secondary,#999);word-break:break-all}
+.dshp-models-btn{appearance:none;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 45%,transparent);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 12%,transparent);color:var(--dsw-alias-label-primary,#f2f2f2);cursor:pointer;font:12px/1 inherit;padding:8px 12px;border-radius:8px}
+.dshp-models-btn[disabled]{opacity:.55;cursor:default}
 .dshp-launch{position:fixed;right:16px;bottom:16px;z-index:10040;appearance:none;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 55%,transparent);border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#1c1c1c) 72%,transparent);color:var(--dsw-alias-label-primary,#f2f2f2);cursor:pointer;font:13px/1 inherit;box-shadow:0 8px 22px color-mix(in srgb,#000 28%,transparent);pointer-events:auto}
 .dshp-launch:hover{border-color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent)}
 .dshp-launch[data-open="1"]{display:none}
@@ -8736,7 +8746,58 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		}
 
 
-		/** 设置页唯一管理入口：清洗 / 演练台都在这一页内联渲染，不再弹悬浮面板。 */
+		/** 模型提示词：按会话模型家族叠加破甲包。读写 /dsh-purge-czx/model-adapt。 */
+		function ModelPackPanel() {
+			const [state, setState] = useState(null);
+			const [err, setErr] = useState("");
+			const [busy, setBusy] = useState(false);
+			const [mode, setMode] = useState("auto");
+			const [family, setFamily] = useState("");
+			const applyState = (d) => {
+				const m = (d && d.modelAdapt) || null;
+				setState(m);
+				if (m) { setMode(m.mode || "auto"); setFamily(m.forcedFamily || ""); }
+				setErr("");
+			};
+			const load = useCallback(() => {
+				apiJson("/dsh-purge-czx/model-adapt").then(applyState, (e) => setErr(String((e && e.message) || e)));
+			}, []);
+			useEffect(() => { load(); }, [load]);
+			const save = (patch) => {
+				setBusy(true);
+				apiJson("/dsh-purge-czx/model-adapt", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify(patch),
+				}).then(applyState, (e) => setErr(String((e && e.message) || e))).finally(() => setBusy(false));
+			};
+			const families = (state && state.families) || [];
+			return h("div", { className: "dshp-models", "data-testid": "dsh-purge-czx-models" },
+				h("p", { className: "dshp-models-meta" }, "按当前会话的模型家族，把对应破甲提示词叠加在注入正文尾部。auto = 自动识别；universal = 只叠通用骨架；family = 强制指定家族；off = 关闭。"),
+				err ? h("p", { className: "dshp-models-err" }, "读取失败 / failed: " + err) : null,
+				h("div", { className: "dshp-models-row" },
+					h("label", null, "模式 / mode"),
+					h("select", { className: "dshp-field", value: mode, disabled: busy, onChange: (e) => setMode(e.target.value) },
+						h("option", { value: "auto" }, "auto"),
+						h("option", { value: "universal" }, "universal"),
+						h("option", { value: "family" }, "family"),
+						h("option", { value: "off" }, "off")),
+					h("label", null, "家族 / family"),
+					h("select", { className: "dshp-field", value: family, disabled: busy || mode !== "family", onChange: (e) => setFamily(e.target.value) },
+						h("option", { value: "" }, "(auto)"),
+						families.map((f) => h("option", { key: f.key, value: f.key }, f.key + " · " + (f.bytes || 0) + "B"))),
+					h("button", { type: "button", className: "dshp-models-btn", disabled: busy, onClick: () => save({ mode, family }) }, "保存 / Save"),
+					h("button", { type: "button", className: "dshp-models-btn", disabled: busy, onClick: () => save({ sync: true }) }, "同步文件 / Sync")),
+				state ? h("ul", { className: "dshp-models-list" },
+					h("li", null, "识别 / detected: " + state.detected + " → 生效 " + state.effectiveFamily),
+					h("li", null, "覆盖层 / overlay: " + state.bytes + "B · 尾巴 " + state.extraBytes + "B"),
+					h("li", null, "目录 / dir: " + state.dir),
+					h("li", null, "家族 / families: " + families.length + " · 模型 id: " + (state.hint || "(unknown)"))) : null,
+				h("p", { className: "dshp-models-meta" }, "改完下一轮注入立即生效；提示词文件可原地编辑，升级只补缺失文件。"),
+			);
+		}
+
+		/** 设置页唯一管理入口：清洗 / 模型提示词 / 演练台都在这一页内联渲染，不再弹悬浮面板。 */
 		function PurgeSettingsPage(props) {
 			const t = (props && props.t) || useT();
 			const [tab, setTab] = useState("clean");
@@ -8784,13 +8845,22 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 						"aria-selected": tab === "drill" ? "true" : "false",
 						onClick: () => setTab("drill"),
 					}, t("dock.drill") + (authorized ? "" : " · " + t("dock.unauthorized"))),
+					h("button", {
+						type: "button",
+						role: "tab",
+						className: "dshp-settings-tab" + (tab === "models" ? " on" : ""),
+						"aria-selected": tab === "models" ? "true" : "false",
+						onClick: () => setTab("models"),
+					}, t("dock.models")),
 				),
 				h("div", { className: "dshp-settings-body" },
 					tab === "clean"
 						? h(SettingsRoot, { t })
-						: (drillReady
-							? h(__dshPurgeDrill.Panel, { embedded: true })
-							: h(AuthGate, { pending: "tab", onDone: () => setAuthRev((n) => n + 1) })),
+						: tab === "models"
+							? h(ModelPackPanel, null)
+							: (drillReady
+								? h(__dshPurgeDrill.Panel, { embedded: true })
+								: h(AuthGate, { pending: "tab", onDone: () => setAuthRev((n) => n + 1) })),
 				),
 			);
 		}

@@ -1,6 +1,6 @@
 {
   "name": "dsh-purge-czx",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分",
   "type": "module",
   "main": "lib/index.js",
@@ -40,7 +40,8 @@
     "check:prompt": "node scripts/check-prompt-render.mjs",
     "verify": "node scripts/verify-release.mjs",
     "test:ui": "node scripts/test-client-ui.mjs",
-    "test": "node scripts/verify-release.mjs && node scripts/test-client-ui.mjs"
+    "test:models": "node scripts/test-model-adapt.mjs",
+    "test": "node scripts/verify-release.mjs && node scripts/test-client-ui.mjs && node scripts/test-model-adapt.mjs"
   },
   "license": "MIT",
   "keywords": [

@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge-czx）</h1>
 
-<p align="center"><strong>Version 1.2.3</strong></p>
+<p align="center"><strong>Version 2.1.0</strong></p>
 
 <p align="center">
   <em>DeepSeek Harness 破甲：让所有模型都能破甲，不同模型可换不同提示词；默认提示词面向国模「小码酱」。Jailbreak for every model — swap prompts per model. 求 Star 收藏 ⭐ 如要二开，请查看署名要求部分</em>
@@ -30,6 +30,14 @@
 > 写进 profile 还不会改宿主。打开 **DSH 设置 → dsh-purge-czx** → **清洗** → **应用**。成功会自动重启；补丁没打完不重启。重启后新开一轮对话，注入才进当前会话。
 >
 > Node.js **≥18**。Windows 无闪窗需要 **Node ≥22**。下面的安装命令统一走本仓库 `https://github.com/czx455501074-afk/dsh-purge-czx`，不装 npm 上的旧包。
+
+## 2.1 更新
+
+- **多模型破甲提示词包。** `presets/model-prompts/` 内置 14 个文件：通用骨架 `universal.md` 加 13 个家族包（claude / gpt / gemini / grok / deepseek / qwen / kimi / glm / minimax / doubao / llama / mistral / generic）。按当前会话的模型 id 自动叠加：通用骨架 → 家族专项 → 你自己的尾巴。
+- **自动识别 + 可强制。** 依次探测 `agent.session.header.model` / `agent.options.model` / `agent.config.model` / 会话 header，识别不了落 generic。设置页新增「模型提示词」页签，可切 `auto / universal / family / off`，也可强制指定家族。
+- **落地可改。** 安装后把包复制到 `$DSH_HOME/dsh-purge-czx/model-prompts/`，升级只补缺失文件，改过的内容不被覆盖；配置写 `$DSH_HOME/dsh-purge-czx/model-adapt.json`（`mode` / `family` / `extra`）。
+- **工具与接口。** `purge_models`（status / list / set / sync / preview）与 `GET|POST /dsh-purge-czx/model-adapt`。
+- **测试。** `npm test` 增加模型适配回归 34 项：识别矩阵、包落地幂等、组合顺序、模式切换、自定义家族、缓存失效。
 
 ## 2.0 更新
 
