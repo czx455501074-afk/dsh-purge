@@ -37,7 +37,10 @@
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
     "build:client": "node scripts/build-client.mjs",
     "diagnose": "node scripts/diagnose-patches.mjs",
-    "check:prompt": "node scripts/check-prompt-render.mjs"
+    "check:prompt": "node scripts/check-prompt-render.mjs",
+    "verify": "node scripts/verify-release.mjs",
+    "test:ui": "node scripts/test-client-ui.mjs",
+    "test": "node scripts/verify-release.mjs && node scripts/test-client-ui.mjs"
   },
   "license": "MIT",
   "keywords": [
